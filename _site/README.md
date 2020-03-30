@@ -22,6 +22,7 @@ After cloning the project.
 
 1. Access the project folder
 2. Run the command
+  sudo bundle install
 
 ---
 
