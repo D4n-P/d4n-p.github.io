@@ -4,9 +4,9 @@
 
 Ruby e GEM
 
-1. Step One *sudo apt install ruby*
-2. Step Two *sudo apt install ruby-full*
-3. Step Three *sudo apt-get install ruby ruby-all-dev*
+1. *sudo apt install ruby*
+2. *sudo apt install ruby-full*
+3. *sudo apt-get install ruby ruby-all-dev*
 
 Jekyll
 
