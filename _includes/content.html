@@ -1,32 +1,17 @@
 <div class="rightcolumn">
+
+  {% for post in site.posts %}
+
   <div class="card">
-    <h2 class="text-source text-blue">TITLE HEADING</h2>
+    <h2 class="text-source text-blue">{{ post.title }}</h2>
     <h5>Title description, Dec 7, 2017</h5>
-    <p>Some text...</p>
-    <p>Sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco.</p>
+    <h5> {{ post.description }} </h5>
+    <h5> {{ post.date | date: "%b, %-d %Y" }} </h5>
     <p class="text-source font-bold"> <small> <i class="fas fa-tags"></i> PHP MYSQL CSS </small> </p>
     <p class="text-right">
-      <a class="text-blue font-bold decoration-none" href="#"> <small>See more...</small> </a>
+      <a class="text-blue font-bold decoration-none" href="{{ post.url }}"> <small>See more...</small> </a>
     </p>
   </div>
-  <div class="card">
-    <h2 class="text-source text-blue">TITLE HEADING</h2>
-    <h5>Title description, Sep 2, 2017</h5>
-    <p>Some text...</p>
-    <p>Sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco.</p>
-    <p class="text-source font-bold"> <small> <i class="fas fa-tags"></i> PHP MYSQL CSS </small> </p>
-    <p class="text-right">
-      <a class="text-blue font-bold decoration-none" href="#"> <small>See more...</small> </a>
-    </p>
-  </div>
-  <div class="card">
-    <h2 class="text-source text-blue">TITLE HEADING</h2>
-    <h5>Title description, Sep 2, 2017</h5>
-    <p>Some text...</p>
-    <p>Sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco.</p>
-    <p class="text-source font-bold"> <small> <i class="fas fa-tags"></i> PHP MYSQL CSS </small> </p>
-    <p class="text-right">
-      <a class="text-blue font-bold decoration-none" href="#"> <small>See more...</small> </a>
-    </p>
-  </div>
+
+  {% endfor %}
 </div>

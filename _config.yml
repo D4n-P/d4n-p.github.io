@@ -13,3 +13,6 @@ github_username:  jekyll
 
 # Build settings
 markdown: kramdown
+
+# only the title of the post will be displayed
+permalink: /:title/
