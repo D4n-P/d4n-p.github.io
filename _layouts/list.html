@@ -1,3 +1,4 @@
+
 {% include head.html %}
 
 {% include header.html %}
@@ -7,15 +8,15 @@
     {% include about.html %}
   </div>
 
-  <div class="rightcolumn">
-    <div class="card">
+    <div class="rightcolumn">
 
-      {% include title.html %}
-
-      {{ content }}
-      
-    </div>
-  </div>
+  	{% for post in site.posts %}
+	
+  		{% include content.html %}
+	
+  	{% endfor %}
+  	
+  	</div>
 
 </div>
 
