@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/css/post.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/scroll.css">
+  <link rel="stylesheet" href="/css/typewriter.css">
+  <link rel="stylesheet" href="/fontawesome/css/all.min.css">
+  <title>My pentest notes</title>
+</head>
+<body>
+
+
+<div class="header">
+  <div>
+    <h3><span class="typewriter">My pentest notes</span></h3>
+  </div>
+</div>
+
+<div class="nav">
+  <ul class="text-source">
+    <li> <a href="/">HOME</a> </li>
+    <li> <a href="\list">POSTS</a> </li>
+    <li> <a href="#">CATEGORIES</a> </li>
+  </ul>
+</div>
+
+
+<div class="row">
+  <div class="leftcolumn">
+    <div class="card">
+  <h2 class="text-source">About Me</h2>
+  <ul class="list-none">
+    <li><i class="fas fa-user mb-08"></i> DanP</li>
+    <li><i class="fas fa-map-marker-alt mb-08"></i> Brazil</li>
+    <li><i class="fas fa-envelope mb-08"></i> 
+    	<a class="decoration-none text-white" target="_blank" href="mailto:soaresdaniel487@gmail.com"> E-mail </a> 
+    </li>
+    <li><i class="fab fa-github"></i> <a class="decoration-none text-white" href="https://github.com/D4nPs" target="_blank">Github</a> </li>
+  </ul>
+</div>
+
+  </div>
+
+  <div class="rightcolumn">
+    <div class="card box-content">
+
+      <h2 class="text-source text-blue"> TAMUCTF2019 PWN3 Write-up </h2>
+<h5> Hey Guys! This post i’ll be showing you how I managed to solve PWN3 challenge from TAMUCTF2019! Let’GO! </h5>
+<h5> May, 3 2019 </h5>
+
+
+      <p>Hey Guys! This post i’ll be showing you how I managed to solve PWN3 challenge from TAMUCTF2019!
+This was a standard stack execution where we had to insert our shellcode in the stack and point ou EIP there to execute it. Let’GO!</p>
+
+<p><img src="/img/jekyll/1/ratf.png" alt="ratf" class="img-responsive" /></p>
+
+<p><img src="/img/jekyll/1/example.png" alt="code example" class="img-responsive" /></p>
+
+<p>Let’s execute the binary locally to see what happens.</p>
+
+<p><img src="/img/jekyll/1/code1.png" alt="code example" class="img-responsive" /></p>
+
+<p>After sending a lot of bytes we get a “seg fault” and that’s what we want. Using GDB let’s find out how many bytes we must send to control EIP.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">gdb</span><span class="o">-</span><span class="n">peda</span><span class="err">$</span> <span class="n">pattern_create</span> <span class="mi">400</span>
+<span class="s1">'AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AALAAhAA7AAMAAiAA8AANAAjAA9AAOAAkAAPAAlAAQAAmAARAAoAASAApAATAAqAAUAArAAVAAtAAWAAuAAXAAvAAYAAwAAZAAxAAyAAzA%%A%sA%BA%$A%nA%CA%-A%(A%DA%;A%)A%EA%aA%0A%FA%bA%1A%GA%cA%2A%HA%dA%3A%IA%eA%4A%JA%fA%5A%KA%gA%6A%LA%hA%7A%MA%iA%8A%NA%jA%9A%OA%kA%PA%lA%QA%mA%RA%oA%SA%pA%TA%qA%UA%rA%VA%tA%WA%uA%XA%vA%YA%wA%ZA%xA%y'</span>
+
+<span class="no">Legend</span><span class="p">:</span> <span class="n">code</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">rodata</span><span class="p">,</span> <span class="n">value</span>
+<span class="no">Stopped</span> <span class="ss">reason: </span><span class="no">SIGSEGV</span>
+<span class="mh">0x25416825</span> <span class="k">in</span> <span class="sc">??</span> <span class="p">()</span>
+<span class="n">gdb</span><span class="o">-</span><span class="n">peda</span><span class="err">$</span> <span class="n">pattern_search</span>
+<span class="no">Registers</span> <span class="n">contain</span> <span class="n">pattern</span> <span class="ss">buffer:
+</span><span class="no">EBX</span><span class="o">+</span><span class="mi">0</span> <span class="n">found</span> <span class="n">at</span> <span class="ss">offset: </span><span class="mi">294</span>
+<span class="no">EBP</span><span class="o">+</span><span class="mi">0</span> <span class="n">found</span> <span class="n">at</span> <span class="ss">offset: </span><span class="mi">298</span>
+<span class="no">EIP</span><span class="o">+</span><span class="mi">0</span> <span class="n">found</span> <span class="n">at</span> <span class="ss">offset: </span><span class="mi">302</span>
+<span class="no">Registers</span> <span class="n">point</span> <span class="n">to</span> <span class="n">pattern</span> <span class="ss">buffer:
+</span><span class="p">[</span><span class="no">EAX</span><span class="p">]</span> <span class="o">--&gt;</span> <span class="n">offset</span> <span class="mi">0</span> <span class="o">-</span> <span class="n">size</span> <span class="o">~</span><span class="mi">203</span>
+<span class="p">[</span><span class="no">ESP</span><span class="p">]</span> <span class="o">--&gt;</span> <span class="n">offset</span> <span class="mi">306</span> <span class="o">-</span> <span class="n">size</span> <span class="o">~</span><span class="mi">94</span></code></pre></figure>
+
+<p>Using pattern_search we discover that offset is 302 bytes long. Cool valuable information there, but where is our ESP? Since that value keeps changing when we connect via netcat ASLR is on, so it gets hard to know where to point to. So we need to discover what is the address that pops up when the program is executed.</p>
+
+<p>Running a few times in different environments I noticed that we can use this address to determine the exact position of our ESP, because that address + 0x132 = $ESP</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="no">Starting</span> <span class="ss">program: </span><span class="sr">/root/</span><span class="n">ctf</span><span class="o">/</span><span class="n">tamu</span><span class="o">/</span><span class="n">pwn3</span><span class="o">/</span><span class="n">pwn3</span> 
+<span class="no">Take</span> <span class="n">this</span><span class="p">,</span> <span class="n">you</span> <span class="n">might</span> <span class="n">need</span> <span class="n">it</span> <span class="n">on</span> <span class="n">your</span> <span class="n">journey</span> <span class="mh">0xffffd01e</span><span class="o">!</span>
+
+<span class="n">gdb</span><span class="o">-</span><span class="n">peda</span><span class="err">$</span> <span class="n">x</span><span class="o">/</span><span class="mi">5</span><span class="n">wx</span> <span class="vg">$esp</span>
+<span class="mh">0xffffd150</span><span class="p">:</span> <span class="mh">0x4d254137</span> <span class="mh">0x41692541</span> <span class="mh">0x25413825</span> <span class="mh">0x6a25414e</span>
+
+<span class="no">So</span><span class="p">,</span> <span class="n">by</span> <span class="n">doing</span> <span class="mh">0xffffd150</span> <span class="o">-</span> <span class="mh">0xffffd01e</span> <span class="o">=</span> <span class="mh">0x132</span></code></pre></figure>
+
+<p>Cool! Now we have everything set, let’s create our exploit.</p>
+
+<p>Got my shellcode from shellstorm.com</p>
+
+<p><img src="/img/jekyll/1/code2.png" alt="code example" class="img-responsive" /></p>
+
+<p>Hope you guys enjoyed it!</p>
+
+<p>by me</p>
+
+      
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <h5>© Copyright 2020 - All Rights Reserved - DanP</h5>
+</div>
+
+
+</body>
+</html>

@@ -6,8 +6,8 @@
 </description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 02 Apr 2020 17:24:51 -0300</pubDate>
-    <lastBuildDate>Thu, 02 Apr 2020 17:24:51 -0300</lastBuildDate>
+    <pubDate>Thu, 02 Apr 2020 19:29:16 -0300</pubDate>
+    <lastBuildDate>Thu, 02 Apr 2020 19:29:16 -0300</lastBuildDate>
     <generator>Jekyll v3.8.6</generator>
     
       <item>
@@ -41,6 +41,75 @@
         <category>jekyll</category>
         
         <category>update</category>
+        
+      </item>
+    
+      <item>
+        <title>TAMUCTF2019 PWN3 Write-up</title>
+        <description>&lt;p&gt;Hey Guys! This post i’ll be showing you how I managed to solve PWN3 challenge from TAMUCTF2019!
+This was a standard stack execution where we had to insert our shellcode in the stack and point ou EIP there to execute it. Let’GO!&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/jekyll/1/ratf.png&quot; alt=&quot;ratf&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/jekyll/1/example.png&quot; alt=&quot;code example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Let’s execute the binary locally to see what happens.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/jekyll/1/code1.png&quot; alt=&quot;code example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;After sending a lot of bytes we get a “seg fault” and that’s what we want. Using GDB let’s find out how many bytes we must send to control EIP.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;n&quot;&gt;gdb&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;peda&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;$&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pattern_create&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;400&lt;/span&gt;
+&lt;span class=&quot;s1&quot;&gt;'AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AALAAhAA7AAMAAiAA8AANAAjAA9AAOAAkAAPAAlAAQAAmAARAAoAASAApAATAAqAAUAArAAVAAtAAWAAuAAXAAvAAYAAwAAZAAxAAyAAzA%%A%sA%BA%$A%nA%CA%-A%(A%DA%;A%)A%EA%aA%0A%FA%bA%1A%GA%cA%2A%HA%dA%3A%IA%eA%4A%JA%fA%5A%KA%gA%6A%LA%hA%7A%MA%iA%8A%NA%jA%9A%OA%kA%PA%lA%QA%mA%RA%oA%SA%pA%TA%qA%UA%rA%VA%tA%WA%uA%XA%vA%YA%wA%ZA%xA%y'&lt;/span&gt;
+
+&lt;span class=&quot;no&quot;&gt;Legend&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;code&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rodata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;
+&lt;span class=&quot;no&quot;&gt;Stopped&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;reason: &lt;/span&gt;&lt;span class=&quot;no&quot;&gt;SIGSEGV&lt;/span&gt;
+&lt;span class=&quot;mh&quot;&gt;0x25416825&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;sc&quot;&gt;??&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;gdb&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;peda&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;$&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pattern_search&lt;/span&gt;
+&lt;span class=&quot;no&quot;&gt;Registers&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;contain&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pattern&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;buffer:
+&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EBX&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;found&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;at&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;offset: &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;294&lt;/span&gt;
+&lt;span class=&quot;no&quot;&gt;EBP&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;found&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;at&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;offset: &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;298&lt;/span&gt;
+&lt;span class=&quot;no&quot;&gt;EIP&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;found&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;at&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;offset: &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;302&lt;/span&gt;
+&lt;span class=&quot;no&quot;&gt;Registers&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;point&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pattern&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;buffer:
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EAX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;--&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;offset&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;size&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;~&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;203&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;ESP&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;--&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;offset&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;306&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;size&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;~&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;94&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Using pattern_search we discover that offset is 302 bytes long. Cool valuable information there, but where is our ESP? Since that value keeps changing when we connect via netcat ASLR is on, so it gets hard to know where to point to. So we need to discover what is the address that pops up when the program is executed.&lt;/p&gt;
+
+&lt;p&gt;Running a few times in different environments I noticed that we can use this address to determine the exact position of our ESP, because that address + 0x132 = $ESP&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;no&quot;&gt;Starting&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;program: &lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/root/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ctf&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tamu&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pwn3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pwn3&lt;/span&gt; 
+&lt;span class=&quot;no&quot;&gt;Take&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;you&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;might&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;need&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;it&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;on&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;your&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;journey&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0xffffd01e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;gdb&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;peda&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;$&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wx&lt;/span&gt; &lt;span class=&quot;vg&quot;&gt;$esp&lt;/span&gt;
+&lt;span class=&quot;mh&quot;&gt;0xffffd150&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x4d254137&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x41692541&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x25413825&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x6a25414e&lt;/span&gt;
+
+&lt;span class=&quot;no&quot;&gt;So&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;by&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;doing&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0xffffd150&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0xffffd01e&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x132&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Cool! Now we have everything set, let’s create our exploit.&lt;/p&gt;
+
+&lt;p&gt;Got my shellcode from shellstorm.com&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/jekyll/1/code2.png&quot; alt=&quot;code example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Hope you guys enjoyed it!&lt;/p&gt;
+
+&lt;p&gt;by me&lt;/p&gt;
+</description>
+        <pubDate>Fri, 03 May 2019 00:00:00 -0300</pubDate>
+        <link>http://localhost:4000/tamuctf2019-pwn3-write-up/</link>
+        <guid isPermaLink="true">http://localhost:4000/tamuctf2019-pwn3-write-up/</guid>
+        
+        <category>CTF</category>
+        
+        <category>RATF</category>
+        
+        <category>FLAG</category>
+        
+        <category>CHALLENGE</category>
+        
+        
+        <category>challenge</category>
         
       </item>
     
