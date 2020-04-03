@@ -11,13 +11,15 @@
     <div class="rightcolumn">
 
     <div class="card-title">
-      <h2 class="text-source"> <i class="fas fa-stream"></i> List</h2>
+      <h2 class="text-source"> <i class="fas fa-stream"></i> All Posts</h2>
     </div>
 
     {% for post in site.posts  %}
 
     <div class="card">
-      <h2 class="text-source text-blue">{{ post.title }}</h2>
+      <h2 class="text-source text-blue">
+        <a class="text-blue decoration-none" href="{{ post.url }}">{{ post.title }} </a>
+      </h2>
       <h5 class="subtitle"> {{ post.date | date: "%b, %-d %Y" }} </h5>
       <h5>{{ post.description }}</h5>
       <h5>Category: {{ post.categories }}</h5>

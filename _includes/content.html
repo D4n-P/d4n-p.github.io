@@ -1,7 +1,8 @@
 
 
   <div class="card">
-    <h2 class="text-source text-blue">{{ post.title }}</h2>
+    <h2 class="text-source text-blue">
+      <a class="text-blue decoration-none" href="{{ post.url }}">{{ post.title }}</a></h2>
     <h5> {{ post.description }} </h5>
     <h5> {{ post.date | date: "%b, %-d %Y" }} </h5>
     <p class="text-source font-bold"> <small> <i class="fas fa-tags"></i> {{ post.tags }} </small> </p>
