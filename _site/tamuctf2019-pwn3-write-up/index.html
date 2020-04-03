@@ -55,48 +55,48 @@
       <p>Hey Guys! This post i’ll be showing you how I managed to solve PWN3 challenge from TAMUCTF2019!
 This was a standard stack execution where we had to insert our shellcode in the stack and point ou EIP there to execute it. Let’GO!</p>
 
-<p><img src="/img/jekyll/1/ratf.png" alt="ratf" class="img-responsive" /></p>
+<p class="text-center"><img src="/img/jekyll/1/ratf.png" alt="ratf" class="img-responsive" /></p>
 
-<p><img src="/img/jekyll/1/example.png" alt="code example" class="img-responsive" /></p>
+<p class="text-center"><img src="/img/jekyll/1/example.png" alt="code example" class="img-responsive" /></p>
 
 <p>Let’s execute the binary locally to see what happens.</p>
 
-<p><img src="/img/jekyll/1/code1.png" alt="code example" class="img-responsive" /></p>
+<p class="text-center"><img src="/img/jekyll/1/code1.png" alt="code example" class="img-responsive" /></p>
 
 <p>After sending a lot of bytes we get a “seg fault” and that’s what we want. Using GDB let’s find out how many bytes we must send to control EIP.</p>
 
-<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">gdb</span><span class="o">-</span><span class="n">peda</span><span class="err">$</span> <span class="n">pattern_create</span> <span class="mi">400</span>
-<span class="s1">'AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AALAAhAA7AAMAAiAA8AANAAjAA9AAOAAkAAPAAlAAQAAmAARAAoAASAApAATAAqAAUAArAAVAAtAAWAAuAAXAAvAAYAAwAAZAAxAAyAAzA%%A%sA%BA%$A%nA%CA%-A%(A%DA%;A%)A%EA%aA%0A%FA%bA%1A%GA%cA%2A%HA%dA%3A%IA%eA%4A%JA%fA%5A%KA%gA%6A%LA%hA%7A%MA%iA%8A%NA%jA%9A%OA%kA%PA%lA%QA%mA%RA%oA%SA%pA%TA%qA%UA%rA%VA%tA%WA%uA%XA%vA%YA%wA%ZA%xA%y'</span>
+<figure class="highlight"><pre><code class="language-cmd" data-lang="cmd">gdb-peda$ pattern_create 400
+'AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AALAAhAA7AAMAAiAA8AANAAjAA9AAOAAkAAPAAlAAQAAmAARAAoAASAApAATAAqAAUAArAAVAAtAAWAAuAAXAAvAAYAAwAAZAAxAAyAAzA%%A%sA%BA%$A%nA%CA%-A%(A%DA%;A%)A%EA%aA%0A%FA%bA%1A%GA%cA%2A%HA%dA%3A%IA%eA%4A%JA%fA%5A%KA%gA%6A%LA%hA%7A%MA%iA%8A%NA%jA%9A%OA%kA%PA%lA%QA%mA%RA%oA%SA%pA%TA%qA%UA%rA%VA%tA%WA%uA%XA%vA%YA%wA%ZA%xA%y'
 
-<span class="no">Legend</span><span class="p">:</span> <span class="n">code</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">rodata</span><span class="p">,</span> <span class="n">value</span>
-<span class="no">Stopped</span> <span class="ss">reason: </span><span class="no">SIGSEGV</span>
-<span class="mh">0x25416825</span> <span class="k">in</span> <span class="sc">??</span> <span class="p">()</span>
-<span class="n">gdb</span><span class="o">-</span><span class="n">peda</span><span class="err">$</span> <span class="n">pattern_search</span>
-<span class="no">Registers</span> <span class="n">contain</span> <span class="n">pattern</span> <span class="ss">buffer:
-</span><span class="no">EBX</span><span class="o">+</span><span class="mi">0</span> <span class="n">found</span> <span class="n">at</span> <span class="ss">offset: </span><span class="mi">294</span>
-<span class="no">EBP</span><span class="o">+</span><span class="mi">0</span> <span class="n">found</span> <span class="n">at</span> <span class="ss">offset: </span><span class="mi">298</span>
-<span class="no">EIP</span><span class="o">+</span><span class="mi">0</span> <span class="n">found</span> <span class="n">at</span> <span class="ss">offset: </span><span class="mi">302</span>
-<span class="no">Registers</span> <span class="n">point</span> <span class="n">to</span> <span class="n">pattern</span> <span class="ss">buffer:
-</span><span class="p">[</span><span class="no">EAX</span><span class="p">]</span> <span class="o">--&gt;</span> <span class="n">offset</span> <span class="mi">0</span> <span class="o">-</span> <span class="n">size</span> <span class="o">~</span><span class="mi">203</span>
-<span class="p">[</span><span class="no">ESP</span><span class="p">]</span> <span class="o">--&gt;</span> <span class="n">offset</span> <span class="mi">306</span> <span class="o">-</span> <span class="n">size</span> <span class="o">~</span><span class="mi">94</span></code></pre></figure>
+Legend: code, data, rodata, value
+Stopped reason: SIGSEGV
+0x25416825 in ?? ()
+gdb-peda$ pattern_search
+Registers contain pattern buffer:
+EBX+0 found at offset: 294
+EBP+0 found at offset: 298
+EIP+0 found at offset: 302
+Registers point to pattern buffer:
+[EAX] --&gt; offset 0 - size ~203
+[ESP] --&gt; offset 306 - size ~94</code></pre></figure>
 
 <p>Using pattern_search we discover that offset is 302 bytes long. Cool valuable information there, but where is our ESP? Since that value keeps changing when we connect via netcat ASLR is on, so it gets hard to know where to point to. So we need to discover what is the address that pops up when the program is executed.</p>
 
 <p>Running a few times in different environments I noticed that we can use this address to determine the exact position of our ESP, because that address + 0x132 = $ESP</p>
 
-<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="no">Starting</span> <span class="ss">program: </span><span class="sr">/root/</span><span class="n">ctf</span><span class="o">/</span><span class="n">tamu</span><span class="o">/</span><span class="n">pwn3</span><span class="o">/</span><span class="n">pwn3</span> 
-<span class="no">Take</span> <span class="n">this</span><span class="p">,</span> <span class="n">you</span> <span class="n">might</span> <span class="n">need</span> <span class="n">it</span> <span class="n">on</span> <span class="n">your</span> <span class="n">journey</span> <span class="mh">0xffffd01e</span><span class="o">!</span>
+<figure class="highlight"><pre><code class="language-mcd" data-lang="mcd">Starting program: /root/ctf/tamu/pwn3/pwn3 
+Take this, you might need it on your journey 0xffffd01e!
 
-<span class="n">gdb</span><span class="o">-</span><span class="n">peda</span><span class="err">$</span> <span class="n">x</span><span class="o">/</span><span class="mi">5</span><span class="n">wx</span> <span class="vg">$esp</span>
-<span class="mh">0xffffd150</span><span class="p">:</span> <span class="mh">0x4d254137</span> <span class="mh">0x41692541</span> <span class="mh">0x25413825</span> <span class="mh">0x6a25414e</span>
+gdb-peda$ x/5wx $esp
+0xffffd150: 0x4d254137 0x41692541 0x25413825 0x6a25414e
 
-<span class="no">So</span><span class="p">,</span> <span class="n">by</span> <span class="n">doing</span> <span class="mh">0xffffd150</span> <span class="o">-</span> <span class="mh">0xffffd01e</span> <span class="o">=</span> <span class="mh">0x132</span></code></pre></figure>
+So, by doing 0xffffd150 - 0xffffd01e = 0x132</code></pre></figure>
 
 <p>Cool! Now we have everything set, let’s create our exploit.</p>
 
 <p>Got my shellcode from shellstorm.com</p>
 
-<p><img src="/img/jekyll/1/code2.png" alt="code example" class="img-responsive" /></p>
+<p class="text-center"><img src="/img/jekyll/1/code2.png" alt="code example" class="img-responsive" /></p>
 
 <p>Hope you guys enjoyed it!</p>
 

