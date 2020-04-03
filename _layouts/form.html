@@ -1,0 +1,31 @@
+{% include head.html %}
+
+{% include header.html %}
+
+<div class="row">
+  <div class="leftcolumn">
+    {% include about.html %}
+  </div>
+
+    <div class="rightcolumn">
+
+      <div class="card-title">
+        <h2 class="text-source"> <i class="fas fa-search"></i> Search</h2>
+      </div>
+
+      <div class="card">
+        <form action="/search" method="get" class="text-center mb-5">
+          <label for="search-box">Search the post</label>
+          <input type="text" id="search_box" name="query">
+          <button type="submit" class="btn btn-white-search"> <i class="fas fa-search"></i> </button>
+        </form>
+      </div>
+    
+    </div>
+
+</div>
+
+{% include footer.html %}
+
+</body>
+</html>
