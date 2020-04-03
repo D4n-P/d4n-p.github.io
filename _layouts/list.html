@@ -14,7 +14,7 @@
       <h2 class="text-source"> <i class="fas fa-stream"></i> List</h2>
     </div>
 
-    {% for post in site.posts %}
+    {% for post in site.posts  %}
 
     <div class="card">
       <h2 class="text-source text-blue">{{ post.title }}</h2>
@@ -24,6 +24,9 @@
       <p class="text-source font-bold"> <small> <i class="fas fa-tags"></i> {{ post.tags }} </small> </p>
       <p class="text-right">
         <a class="text-blue font-bold decoration-none" href="{{ post.url }}"> <small>See more...</small> <i class="fas fa-paper-plane"></i> </a>
+      </p>
+      <p>
+        {% include share-bar.html %}
       </p>
     </div>
   

@@ -446,8 +446,7 @@ pre {
 
   .img-responsive{
     border: 1px solid #009cea;
-    padding: 10px;
-    box-shadow: 8px 8px 5px #131719;
+    box-shadow: 8px 8px 5px #343d42;
     margin-bottom: 30px;
     margin-top: 10px;
   }
@@ -481,7 +480,7 @@ pre {
 
 /* Facebook button */
 .fa-facebook {
-    color: #3b5998;
+    color: #fff;
 }
 .fa-facebook:hover {
     background-color: #3b5998;
@@ -489,39 +488,15 @@ pre {
 
 /* Twitter button */
 .fa-twitter {
-    color: #55acee;
+    color: #fff;
 }
 .fa-twitter:hover {
     background-color: #55acee;
 }
 
-/* Google-PLus button */
-.fa-google-plus {
-    color: #dd4b39;
-}
-.fa-google-plus:hover {
-    background-color: #dd4b39;
-}
-
-/* Pinterest button */
-.fa-pinterest-p {
-    color: #cb2027;
-}
-.fa-pinterest-p:hover {
-    background-color: #cb2027;
-}
-
-/* Tumblr button */
-.fa-tumblr {
-    color: #32506d;
-}
-.fa-tumblr:hover {
-    background-color: #32506d;
-}
-
 /* Reddit button */
 .fa-reddit-alien {
-    color: #ff4500;
+    color: #fff;
 }
 .fa-reddit-alien:hover {
     background-color: #ff4500;
@@ -529,7 +504,7 @@ pre {
 
 /* LinkedIn button */
 .fa-linkedin {
-    color: #007bb5;
+    color: #fff;
 }
 .fa-linkedin:hover {
     background-color: #007bb5;
@@ -537,7 +512,7 @@ pre {
 
 /* Email button */
 .fa-envelope {
-    color: #444444;
+    color: #fff;
 }
 .fa-envelope:hover {
     background-color: #444444;
