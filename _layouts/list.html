@@ -10,13 +10,22 @@
 
     <div class="rightcolumn">
 
-  	{% for post in site.posts %}
-	
-  		{% include content.html %}
-	
-  	{% endfor %}
-  	
-  	</div>
+    {% for post in site.posts %}
+
+    <div class="card">
+      <h2 class="text-source text-blue">{{ post.title }}</h2>
+      <h5 class="subtitle"> {{ post.date | date: "%b, %-d %Y" }} </h5>
+      <h5>{{ post.description }}</h5>
+      <h5>Category: {{ post.categories }}</h5>
+      <p class="text-source font-bold"> <small> <i class="fas fa-tags"></i> {{ post.tags }} </small> </p>
+      <p class="text-right">
+        <a class="text-blue font-bold decoration-none" href="{{ post.url }}"> <small>See more...</small> </a>
+      </p>
+    </div>
+  
+    {% endfor %}
+    
+    </div>
 
 </div>
 

