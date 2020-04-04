@@ -23,6 +23,13 @@
       <h5 class="subtitle"> {{ post.date | date: "%b, %-d %Y" }} </h5>
       <h5>{{ post.description }}</h5>
       <h5>Category: {{ post.categories }}</h5>
+      {%if post.image %}
+
+      <p>
+        <img src="{{ post.image }}">
+      </p>
+
+      {%endif%}
       <p class="text-source font-bold"> <small> <i class="fas fa-tags"></i> {{ post.tags }} </small> </p>
       <p>
         {% include share.html %}
