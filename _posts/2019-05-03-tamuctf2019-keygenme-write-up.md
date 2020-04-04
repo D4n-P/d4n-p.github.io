@@ -216,7 +216,7 @@ print flagfinal
 
 {% endhighlight %}
 
-[LINK BASE GITHUB][link1]
+[LINK BASE GITHUB][link1]{:class="btn btn-blue"}
 {:class="text-center"}
 
 [link1]: https://gist.githubusercontent.com/D4nPs/7c71f549298b7e64101133b45df4cdeb/raw/94d7270e776c192477b23393f54b11a6244fa9c8/test.py

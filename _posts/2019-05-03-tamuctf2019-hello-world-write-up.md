@@ -144,7 +144,7 @@ print "[+]FLAG:"+ support2
 
 {% endhighlight %}
 
-[LINK BASE GITHUB][link1]
+[LINK BASE GITHUB][link1]{:class="btn btn-blue"}
 {:class="text-center"}
 
 [link1]:https://gist.githubusercontent.com/D4nPs/e206fcf9109159b823041e25452263d6/raw/7a564de46c45724270c41f1e7a4f12c4c0553a24/hello.py

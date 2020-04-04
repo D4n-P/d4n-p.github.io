@@ -6,8 +6,8 @@
 </description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sat, 04 Apr 2020 11:55:53 -0300</pubDate>
-    <lastBuildDate>Sat, 04 Apr 2020 11:55:53 -0300</lastBuildDate>
+    <pubDate>Sat, 04 Apr 2020 11:58:20 -0300</pubDate>
+    <lastBuildDate>Sat, 04 Apr 2020 11:58:20 -0300</lastBuildDate>
     <generator>Jekyll v3.8.6</generator>
     
       <item>
@@ -530,7 +530,7 @@ loc_9cc:
 
 	&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
-&lt;p class=&quot;text-center&quot;&gt;&lt;a href=&quot;https://gist.githubusercontent.com/D4nPs/7c71f549298b7e64101133b45df4cdeb/raw/94d7270e776c192477b23393f54b11a6244fa9c8/test.py&quot;&gt;LINK BASE GITHUB&lt;/a&gt;&lt;/p&gt;
+&lt;p class=&quot;text-center&quot;&gt;&lt;a href=&quot;https://gist.githubusercontent.com/D4nPs/7c71f549298b7e64101133b45df4cdeb/raw/94d7270e776c192477b23393f54b11a6244fa9c8/test.py&quot; class=&quot;btn btn-blue&quot;&gt;LINK BASE GITHUB&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;By running this script I got&lt;/p&gt;
 
@@ -715,7 +715,7 @@ loc_9cc:
 
 &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;[+]FLAG:&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;support2&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
-&lt;p class=&quot;text-center&quot;&gt;&lt;a href=&quot;https://gist.githubusercontent.com/D4nPs/e206fcf9109159b823041e25452263d6/raw/7a564de46c45724270c41f1e7a4f12c4c0553a24/hello.py&quot;&gt;LINK BASE GITHUB&lt;/a&gt;&lt;/p&gt;
+&lt;p class=&quot;text-center&quot;&gt;&lt;a href=&quot;https://gist.githubusercontent.com/D4nPs/e206fcf9109159b823041e25452263d6/raw/7a564de46c45724270c41f1e7a4f12c4c0553a24/hello.py&quot; class=&quot;btn btn-blue&quot;&gt;LINK BASE GITHUB&lt;/a&gt;&lt;/p&gt;
 
 &lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/5/code2.png&quot; alt=&quot;ratf&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
 
