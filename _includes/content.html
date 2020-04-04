@@ -14,7 +14,11 @@
 
     {%endif%}
 
-    <p class="text-source font-bold"> <small> <i class="fas fa-tags"></i> {{ post.tags }} </small> </p>
+    <p class="text-source font-bold"> <small> <i class="fas fa-tags"></i>
+    {% for tag in post.tags %}
+     {{ tag }}
+    {% endfor %}
+    </small> </p>
     <p>
   		{% include share.html %}
   	</p>
