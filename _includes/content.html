@@ -5,6 +5,15 @@
       <a class="text-blue decoration-none" href="{{ post.url }}">{{ post.title }}</a></h2>
     <h5> {{ post.description }} </h5>
     <h5> {{ post.date | date: "%b, %-d %Y" }} </h5>
+    
+    {%if post.image %}
+
+    <p class="text-center">
+      <img class="img-post" src="{{ post.image }}">
+    </p>
+
+    {%endif%}
+
     <p class="text-source font-bold"> <small> <i class="fas fa-tags"></i> {{ post.tags }} </small> </p>
     <p>
   		{% include share.html %}

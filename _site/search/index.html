@@ -65,6 +65,15 @@
 <script>
   window.store = {
     
+      "my-first-post": {
+        "title": "My model",
+        "author": "",
+        "category": "",
+        "content": "",
+        "url": "/my-first-post/"
+      }
+      ,
+    
       "tamuctf2019-wordpress-write-up": {
         "title": "TAMUCTF2019 Wordpress Write-up",
         "author": "",
@@ -116,15 +125,6 @@
         "category": "",
         "content": "Fala galera! até o dia 17/04 rolou a 1ª etapa do Hackaflag 2019.Consegui a 4ª colocação nesse etapa e os desafios foram bem legais.Resolvi trazer esses dois porque foram os que achei mais divertidos de resolver.PS: Esses foram os métodos que usei para resolver, talvez não os melhores, mas com certeza cheguei nas flags xd1 Desafio -&gt; MISCDescrição: Por mais pequeno que seja, esse desafio vem com a missão de fazer você conhecer um formato de arquivo EPS e entender como ele é composto.Além dessa breve descrição nos é dado um arquivo para download. Vamos analisá-lo.[~/ctf/hackaflag/misc]$ file flag                                            flag: DOS EPS Binary File Postscript starts at byte 30 length 68473 TIFF starts at byte 68503 length 2317330Bem como disse a descrição, temos um arquivo EPS, mas ainda não conseguimos abri-lo porque no próprio retorno do comando file ele nos diz que o EPS começa no byte 30.Precisamos remover esses 30 primeiros bytes. Vamos usar o comando ‘dd’ para isso.dd if=flag of=flag.eps ibs=30 skip=1Agora quando rodamos o comando ‘file’ novamente já nos é retornado outra coisa[~/ctf/hackaflag/misc/writeup]$ file flag.eps                                               flag.eps: PostScript document text conforming DSC level 3.0, type EPS, Level 2Vamos tentar abrí-lo com o programa InkscapeErro, pois ainda no arquivo há um tiff como vimos la no primeiro ‘file’ que demos.Para retirá-lo, vamos usar o comando ‘truncate’[~/ctf/hackaflag/misc/writeup]$ truncate -s 68395 flag.epsAgora ao abrí-lo com o Inkscape, temosEssa imagem.Essa parte é sem dúvida a pior do desafio, achar onde diabos está a flag aqui.Passei horas, cheguei a pensar que a flag não estivesse na imagem de tanto procurar, mas ela está ai. Uma parte da definição de uma EPS file diz isso:It is more like a postscript program that instructs images and drawings to be placed on a documentEntão pesquisei em formas de manipular essas imagens presentes e uma delas me ajudou, o XML Editor.Até queTa aí a coisa.Pegando todos os chars temos:HACKAFLAG{ESCOND_DO_NO_L_MBO}O que não é a flag final, mas é fácil ver que a flag fica…HACKAFLAG{ESCONDIDO_NO_LIMBO}2 desafio -&gt; REVERSEDesafio mais complicado dessa primeira etapa, foi o que teve menos solves. Por assumir coisas erradas demorei muito mais tempo do que precisava para resolver esse desafio, mas no fim deu tudo certo.Descrição: Consegue me ajudar?Além da descrição nos é dado um binário, campinas.exe. Um binário windows, vamos executá-lo.De cara já temos nossa flag em b64 somente - , sqn xdJoguei o binário no Ghidra para ver do que se tratava.Analisando as funções vemos uma bem interessante, Criptografar.Mas está muito complicado de analisá-la assim, fui atrás de ver as strings para ver se encontrava alguma luz.Analisando notei essa que dizia “.NET framework 4.6.1” e eu sei que consigo usar decompiler nesses sistemas, no caso usei o dotPeek da JetBrains e consegui o código descompilado da função Criptografar.Analisando passo a passo do código\tPrimeiro é feito uma requisição para essa string em hexa mas em uma formatação estranha, depois é passado outros parâmetros como método, ContentType, etc, quem não nos interessa.\tDepois ele pega o conteúdo recebido do servidor e joga no MD5cryptoServiceProvider, ou seja, gera um md5 do retorno.\tApós isso, é criado um TripleDESCryptoServiceProvider que tem como um dos parâmetros a chave, que é a hash md5 que foi gerado a pouco.\tAo final retorna a flag em base64 como vimos ao rodar o programa.Nossa primeira e mais difícil tarefa será descobrir o endereço dessa requisição para conseguir nossa chave.Vemos que a string encodada passada está em servindo de parâmetro para outra função, vamos analisá-la, a class8_metho0, no meu caso.No caso a class8_method0 só faz uma checagem de data e retorna a string para a class9_method0Fiz uma pequena alteração no código e rodei a função passando a string e o inteiro que vi na função Criptografa.E me é retornado isso:xdd`c*??xqs{qv|qw&gt;s}&gt;rb?sdv?tucqvyc?!qt(vt”tvrr qts !%t’r#%q$”rr)r()?s}}q~ts~db|&gt;`x`wtf is isso?Notei que eu estava esperando uma url e resolvi comparar, notemos que podemos fazer ascii(x) — 16 -&gt; h ascii(d) +16 -&gt; t ascii(`)-&gt; p ascii(c) + 16-&gt; s daí ja conseguimos o ‘https’Eu realmente espero do fundo do coração que haja um método melhor de resolver do que esse T.TAo terminarmos de decodar:https://hackaflag.com.br/ctf/desafios/1ad8fd2dfbb0adc015d7b35a42bb9b89/commandcontrol.phpAcessando esse link encontramos nossa chave.THMPV-77D6F-94376–8HGKG-VRDRQDepois disso devemos lembrar que a chave foi encodada em b64 para fazer criptografar nossa flag.Então,\tCriptografia TripleDES\tModo ECB\tchave = d5637a2c7e17f17947df72f5b3d3d20c\tflag = YMP1zrjTmr1P0wVJh7ocL55O5ZY3EYecJá temos tudo!Usei essa ótima ferramenta online para conseguir a flag.CLICK TO ACCESS 3DES EncryptionTive que passar a flag para hex, pois a tool não suportava b64.HACKAFLAG{TripleDESneT}Assim foi como resolvi essas duas flags dessa etapa, espero que alguém tenha aprendido algo, se não escrevi isso tudo pra nada xdObrigado!By me",
         "url": "/hackflag-campinas-reverse-&amp;-misc-write-up/"
-      }
-      ,
-    
-      "my-first-post": {
-        "title": "My first",
-        "author": "",
-        "category": "",
-        "content": "colado no asterisco digita alguma coisa haha italico por exemplo er assim",
-        "url": "/my-first-post/"
       }
       ,
     
