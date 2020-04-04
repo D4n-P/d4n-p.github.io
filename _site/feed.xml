@@ -6,8 +6,8 @@
 </description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 03 Apr 2020 19:46:52 -0300</pubDate>
-    <lastBuildDate>Fri, 03 Apr 2020 19:46:52 -0300</lastBuildDate>
+    <pubDate>Fri, 03 Apr 2020 22:12:13 -0300</pubDate>
+    <lastBuildDate>Fri, 03 Apr 2020 22:12:13 -0300</lastBuildDate>
     <generator>Jekyll v3.8.6</generator>
     
       <item>
@@ -893,6 +893,29 @@ Ao terminarmos de decodar:&lt;/p&gt;
         <pubDate>Thu, 18 Apr 2019 00:00:00 -0300</pubDate>
         <link>http://localhost:4000/hackflag-campinas-reverse-&-misc-write-up/</link>
         <guid isPermaLink="true">http://localhost:4000/hackflag-campinas-reverse-&-misc-write-up/</guid>
+        
+        <category>CTF</category>
+        
+        <category>|</category>
+        
+        <category>FLAG</category>
+        
+        <category>|</category>
+        
+        <category>CHALLENGE</category>
+        
+        
+        <category>challenge</category>
+        
+      </item>
+    
+      <item>
+        <title>My first</title>
+        <description>&lt;p&gt;&lt;strong&gt;colado no asterisco digita alguma coisa&lt;/strong&gt; &lt;code class=&quot;highlighter-rouge&quot;&gt;haha&lt;/code&gt; &lt;em&gt;italico por exemplo er assim&lt;/em&gt;&lt;/p&gt;
+</description>
+        <pubDate>Sat, 23 Mar 2019 00:00:00 -0300</pubDate>
+        <link>http://localhost:4000/my-first-post/</link>
+        <guid isPermaLink="true">http://localhost:4000/my-first-post/</guid>
         
         <category>CTF</category>
         

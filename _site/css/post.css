@@ -76,7 +76,7 @@ blockquote {
 pre,
 code {
   font-size: 15px;
-  border: 1px solid #e8e8e8;
+  border: 1px solid #0d8ab0;
   border-radius: 3px;
   background-color: #2f2f33; }
 
@@ -302,9 +302,9 @@ pre {
  * Syntax highlighting styles
  */
 .highlight {
-  background: #fff; }
+  background: #2f2f33; }
   .highlighter-rouge .highlight {
-    background: #eef; }
+    background: #2f2f33; }
   .highlight .c {
     color: #998;
     font-style: italic; }
@@ -445,8 +445,7 @@ pre {
   }
 
   .img-responsive{
-    border: 1px solid #009cea;
-    box-shadow: 8px 8px 5px #343d42;
+    border: 3px solid #009cea;
     margin-bottom: 30px;
     margin-top: 10px;
   }

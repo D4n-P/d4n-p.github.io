@@ -131,14 +131,15 @@ li a {
 
 /* Fake image */
 .link-pop-post {
-  background-color: #aaa;
-  color: #000;
+  border: 1px solid #aaa;
+  color: #fff;
   width: 100%;
   padding: 20px;
+  cursor: pointer;
 }
 
 .link-pop-post:hover{
-  background: #0d7c9e;
+  border: 1px solid #0d7c9e;
   color: white;
 }
 

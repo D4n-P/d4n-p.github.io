@@ -6,9 +6,6 @@
     <h5> {{ post.description }} </h5>
     <h5> {{ post.date | date: "%b, %-d %Y" }} </h5>
     <p class="text-source font-bold"> <small> <i class="fas fa-tags"></i> {{ post.tags }} </small> </p>
-    <p class="text-right">
-      <a class="text-blue font-bold decoration-none" href="{{ post.url }}"> <small>See more... <i class="fas fa-paper-plane"></i></small> </a>
-    </p>
     <p>
   		{% include share.html %}
   	</p>
