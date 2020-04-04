@@ -85,7 +85,7 @@ GET     301 Moved Permanently           http://registry.htb/install
 
 ```rustbuster``` found a ```/install``` directory. Browsing there, we find a bunch o gibberish that's clearly a file, we can download with ```curl```and save it locally.
 
-```bash
+```
 curl http://registry.htb/install/ -s > install
 ```
 
@@ -129,7 +129,7 @@ The first one we see some links about ```docker registry``` , and the ```ca.crt`
 
 Another blank page, running ```rustbuster```again.
 
-```terminal
+```
 danps@pwnbox:~/hackthebox/registry$ rustbuster dir -u "http://docker.registry.htb/" -w /usr/share/wordlists/dirb/common.txt  --no-banner
 ~ rustbuster v3.0.3 ~ by phra & ps1dr3x ~
 
@@ -175,7 +175,7 @@ According to the official docker documentation, we need to add some valid certif
 
 First, we generate our client certificate
 
-```bash
+```
 openssl genrsa -out client.key 4096
 openssl req -new -x509 -text -key client.key -out client.cert
 ```
@@ -212,7 +212,7 @@ To find what images are stored in this register we can browse to ```_catalog``` 
 
 We discover a ```bolt-image```, let's pull and run it locally.
 
-```bash
+```
 sudo docker pull docker.registry.htb/bolt-image
 ```
 
@@ -224,7 +224,7 @@ docker.registry.htb/bolt-image   latest              601499e98a60        10 mont
 
 Now let's enumerate it to see if we find any valid credentials.
 
-```bash
+```
 sudo docker run -it docker.registry.htb/bolt-image
 ```
 
@@ -282,7 +282,7 @@ bolt@bolt:~$
 
 Now that we're inside, let's fetch our ```user.txt```.
 
-```bash
+```
 bolt@bolt:~$ cat user.txt
 ytc0ytdmnz<redacted>
 ```
@@ -310,7 +310,7 @@ Googling a bit about bolt RCEs, I found this great [article](https://fgsec.net/f
 
 Searching the web files and configs, we find a ```/var/www/html/bolt/app/database/bolt.db```which is very likely to have our credential stored.
 
-```bash
+```
 strings /var/www/html/bolt/app/database/bolt.db
 ```
 
