@@ -7,6 +7,8 @@ tags: CTF | RATF |  FLAG  |  CHALLENGE
 description: Hey guys, This is how I solved the Onboading Checklist Challenge from TamuCTF 2019. 
 ---
 
+<small> <i> Tags: CTF | RATF | FLAG | CHALLENGE </i> </small>
+
 Hey guys, This is how I solved the Onboading Checklist Challenge from TamuCTF 2019. 
 
 This kind of challenge you don’t see everyday so it was a lot of fun and really simple. 

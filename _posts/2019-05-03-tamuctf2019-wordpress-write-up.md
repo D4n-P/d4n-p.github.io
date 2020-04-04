@@ -7,6 +7,8 @@ tags: CTF | RATF | FLAG | CHALLENGE
 description: Hey guys! This post i’m my mindset on how I solved the Wordpress challenge from TAMUCTF2019
 ---
 
+<small> <i> Tags: CTF | RATF | FLAG | CHALLENGE </i> </small>
+
 Hey guys! This post i’m my mindset on how I solved the Wordpress challenge from TAMUCTF2019
 
 This kind of challenge is very similar to those HackTheBox challenges, where you have to get RCE from a system and then escalate your privileges to root! Let’s GO.

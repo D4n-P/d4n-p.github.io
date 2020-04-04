@@ -6,8 +6,8 @@
 </description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sat, 04 Apr 2020 11:49:52 -0300</pubDate>
-    <lastBuildDate>Sat, 04 Apr 2020 11:49:52 -0300</lastBuildDate>
+    <pubDate>Sat, 04 Apr 2020 11:55:53 -0300</pubDate>
+    <lastBuildDate>Sat, 04 Apr 2020 11:55:53 -0300</lastBuildDate>
     <generator>Jekyll v3.8.6</generator>
     
       <item>
@@ -27,7 +27,9 @@
     
       <item>
         <title>TAMUCTF2019 Wordpress Write-up</title>
-        <description>&lt;p&gt;Hey guys! This post i’m my mindset on how I solved the Wordpress challenge from TAMUCTF2019&lt;/p&gt;
+        <description>&lt;p&gt;&lt;small&gt; &lt;i&gt; Tags: CTF | RATF | FLAG | CHALLENGE &lt;/i&gt; &lt;/small&gt;&lt;/p&gt;
+
+&lt;p&gt;Hey guys! This post i’m my mindset on how I solved the Wordpress challenge from TAMUCTF2019&lt;/p&gt;
 
 &lt;p&gt;This kind of challenge is very similar to those HackTheBox challenges, where you have to get RCE from a system and then escalate your privileges to root! Let’s GO.&lt;/p&gt;
 
@@ -229,7 +231,9 @@ MySQL [mysql]&amp;gt; select * from foo
     
       <item>
         <title>TAMUCTF2019 PWN3 Write-up</title>
-        <description>&lt;p&gt;Hey Guys! This post i’ll be showing you how I managed to solve PWN3 challenge from TAMUCTF2019!
+        <description>&lt;p&gt;&lt;small&gt; &lt;i&gt; Tags: CTF | RATF | FLAG | CHALLENGE &lt;/i&gt; &lt;/small&gt;&lt;/p&gt;
+
+&lt;p&gt;Hey Guys! This post i’ll be showing you how I managed to solve PWN3 challenge from TAMUCTF2019!
 This was a standard stack execution where we had to insert our shellcode in the stack and point ou EIP there to execute it. Let’GO!&lt;/p&gt;
 
 &lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/1/ratf.png&quot; alt=&quot;ratf&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
@@ -304,7 +308,9 @@ So, by doing 0xffffd150 - 0xffffd01e = 0x132&lt;/code&gt;&lt;/pre&gt;&lt;/figure
     
       <item>
         <title>TAMUCTF2019 Onboarding Checklist Write-up</title>
-        <description>&lt;p&gt;Hey guys, This is how I solved the Onboading Checklist Challenge from TamuCTF 2019.&lt;/p&gt;
+        <description>&lt;p&gt;&lt;small&gt; &lt;i&gt; Tags: CTF | RATF | FLAG | CHALLENGE &lt;/i&gt; &lt;/small&gt;&lt;/p&gt;
+
+&lt;p&gt;Hey guys, This is how I solved the Onboading Checklist Challenge from TamuCTF 2019.&lt;/p&gt;
 
 &lt;p&gt;This kind of challenge you don’t see everyday so it was a lot of fun and really simple.&lt;/p&gt;
 
@@ -354,7 +360,9 @@ So, all we have to do is send a spoofed email to tamuctf@gmail pretending to “
     
       <item>
         <title>TAMUCTF2019 Keygenme — Write-up</title>
-        <description>&lt;p&gt;Hello everybody! This is how I solved one of the many reversing problems at TAMUCTF 2019.&lt;/p&gt;
+        <description>&lt;p&gt;&lt;small&gt; &lt;i&gt; Tags: CTF | RATF | FLAG | CHALLENGE &lt;/i&gt; &lt;/small&gt;&lt;/p&gt;
+
+&lt;p&gt;Hello everybody! This is how I solved one of the many reversing problems at TAMUCTF 2019.&lt;/p&gt;
 
 &lt;p&gt;This one was Keygenme, a pretty standard kind of challenge but yet very fun to solve it.&lt;/p&gt;
 
@@ -581,7 +589,9 @@ loc_9cc:
     
       <item>
         <title>TAMUCTF2019 Hello World Write-up</title>
-        <description>&lt;p&gt;Hey guys! This post I’ll be showing you how I solved the Hello World Challenge from TAMUCTF2019.&lt;/p&gt;
+        <description>&lt;p&gt;&lt;small&gt; &lt;i&gt; Tags: CTF | RATF | FLAG | CHALLENGE &lt;/i&gt; &lt;/small&gt;&lt;/p&gt;
+
+&lt;p&gt;Hey guys! This post I’ll be showing you how I solved the Hello World Challenge from TAMUCTF2019.&lt;/p&gt;
 
 &lt;p&gt;This was a MISC challenge rated as medium difficulty by the CTF organizers.&lt;/p&gt;
 
@@ -738,7 +748,9 @@ loc_9cc:
     
       <item>
         <title>HACKAFLAG CAMPINAS Reverse &amp; Misc Write-up</title>
-        <description>&lt;p&gt;Fala galera! até o dia 17/04 rolou a 1ª etapa do Hackaflag 2019.Consegui a 4ª colocação nesse etapa e os desafios foram bem legais.&lt;/p&gt;
+        <description>&lt;p&gt;&lt;small&gt; &lt;i&gt; Tags: CTF | RATF | FLAG | CHALLENGE &lt;/i&gt; &lt;/small&gt;&lt;/p&gt;
+
+&lt;p&gt;Fala galera! até o dia 17/04 rolou a 1ª etapa do Hackaflag 2019.Consegui a 4ª colocação nesse etapa e os desafios foram bem legais.&lt;/p&gt;
 
 &lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/7/code.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
 
@@ -926,7 +938,9 @@ Ao terminarmos de decodar:&lt;/p&gt;
     
       <item>
         <title>Frolic — HacktheBox Walkthrough</title>
-        <description>&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/6/desc.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+        <description>&lt;p&gt;&lt;small&gt; &lt;i&gt; Tags: CTF | RATF | FLAG | CHALLENGE &lt;/i&gt; &lt;/small&gt;&lt;/p&gt;
+
+&lt;p class=&quot;text-center&quot;&gt;&lt;img src=&quot;/img/jekyll/6/desc.png&quot; alt=&quot;image example&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Hey guys! In this post I will be showing how I solved the machine “Frolic” from HackTheBox.&lt;/p&gt;
 

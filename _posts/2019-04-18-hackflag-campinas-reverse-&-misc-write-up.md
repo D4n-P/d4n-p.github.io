@@ -7,6 +7,8 @@ tags: CTF | FLAG  |  CHALLENGE
 description: Fala galera! até o dia 17/04 rolou a 1ª etapa do Hackaflag 2019.Consegui a 4ª colocação nesse etapa e os desafios foram bem legais.
 ---
 
+<small> <i> Tags: CTF | RATF | FLAG | CHALLENGE </i> </small>
+
 Fala galera! até o dia 17/04 rolou a 1ª etapa do Hackaflag 2019.Consegui a 4ª colocação nesse etapa e os desafios foram bem legais.
 
 ![image example](/img/jekyll/7/code.png){:class="img-responsive"}

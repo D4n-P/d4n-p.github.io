@@ -7,6 +7,8 @@ tags: CTF | RATF |  FLAG  |  CHALLENGE
 description: Hey guys! This post I’ll be showing you how I solved the Hello World Challenge from TAMUCTF2019.
 ---
 
+<small> <i> Tags: CTF | RATF | FLAG | CHALLENGE </i> </small>
+
 Hey guys! This post I’ll be showing you how I solved the Hello World Challenge from TAMUCTF2019.
 
 This was a MISC challenge rated as medium difficulty by the CTF organizers.

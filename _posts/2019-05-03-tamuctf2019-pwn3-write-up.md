@@ -7,6 +7,8 @@ tags: CTF | RATF | FLAG | CHALLENGE
 description: Hey Guys! This post i’ll be showing you how I managed to solve PWN3 challenge from TAMUCTF2019! Let’GO!
 ---
 
+<small> <i> Tags: CTF | RATF | FLAG | CHALLENGE </i> </small>
+
 Hey Guys! This post i’ll be showing you how I managed to solve PWN3 challenge from TAMUCTF2019!
 This was a standard stack execution where we had to insert our shellcode in the stack and point ou EIP there to execute it. Let’GO!
 

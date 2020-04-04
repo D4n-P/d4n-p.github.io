@@ -7,6 +7,8 @@ tags: CTF | RATF |  FLAG  |  CHALLENGE
 description: Hello everybody! This is how I solved one of the many reversing problems at TAMUCTF 2019.
 ---
 
+<small> <i> Tags: CTF | RATF | FLAG | CHALLENGE </i> </small>
+
 Hello everybody! This is how I solved one of the many reversing problems at TAMUCTF 2019.
 
 This one was Keygenme, a pretty standard kind of challenge but yet very fun to solve it.
