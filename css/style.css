@@ -253,7 +253,6 @@ li a {
 
 .img-post{
   max-height: 177px;
-  width: 100%;
   object-fit: cover;
 }
 

