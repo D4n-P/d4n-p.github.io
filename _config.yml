@@ -12,3 +12,6 @@ markdown: kramdown
 
 # only the title of the post will be displayed
 permalink: /:title/
+
+# Analytics
+prod-analytics-id: G-4GB1Y6FFJE

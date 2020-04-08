@@ -167,7 +167,7 @@ GET     301 Moved Permanently           http://registry.htb/install
 
 <p><code class="highlighter-rouge">rustbuster</code> found a <code class="highlighter-rouge">/install</code> directory. Browsing there, we find a bunch o gibberish that’s clearly a file, we can download with <code class="highlighter-rouge">curl</code>and save it locally.</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl http://registry.htb/install/ <span class="nt">-s</span> <span class="o">&gt;</span> <span class="nb">install</span>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl http://registry.htb/install/ -s &gt; install
 </code></pre></div></div>
 
 <p>Extracting the file we just got, we see two files</p>
@@ -211,15 +211,15 @@ QMPjq1S5SqXJqzop4OnthgWlwggSe/6z8ZTuDjdNIpx0tF77arh2rUOIXKIerx5B
 
 <p>Another blank page, running <code class="highlighter-rouge">rustbuster</code>again.</p>
 
-<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">danps@pwnbox:~/hackthebox/registry$</span><span class="w"> </span>rustbuster <span class="nb">dir</span> <span class="nt">-u</span> <span class="s2">"http://docker.registry.htb/"</span> <span class="nt">-w</span> /usr/share/wordlists/dirb/common.txt  <span class="nt">--no-banner</span>
-<span class="go">~ rustbuster v3.0.3 ~ by phra &amp; ps1dr3x ~
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>danps@pwnbox:~/hackthebox/registry$ rustbuster dir -u "http://docker.registry.htb/" -w /usr/share/wordlists/dirb/common.txt  --no-banner
+~ rustbuster v3.0.3 ~ by phra &amp; ps1dr3x ~
 
 [?] Started at	: 2020-04-03 10:47:24
 
 GET	200 OK				                      http://docker.registry.htb/
 GET     301 Moved Permanently           http://docker.registry.htb/v2
-</span><span class="gp">						=&gt;</span><span class="w"> </span>/v2/
-<span class="gp">  [00:00:51] #</span><span class="c">#######################################    4611/4611    ETA: 00:00:00 req/s: 90</span>
+						=&gt; /v2/
+  [00:00:51] ########################################    4611/4611    ETA: 00:00:00 req/s: 90
 </code></pre></div></div>
 
 <p>We find a <code class="highlighter-rouge">v2</code>directory.</p>
@@ -254,8 +254,8 @@ Error response from daemon: Get https://docker.registry.htb/v2/: x509: certifica
 
 <p>First, we generate our client certificate</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>openssl genrsa <span class="nt">-out</span> client.key 4096
-openssl req <span class="nt">-new</span> <span class="nt">-x509</span> <span class="nt">-text</span> <span class="nt">-key</span> client.key <span class="nt">-out</span> client.cert
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>openssl genrsa -out client.key 4096
+openssl req -new -x509 -text -key client.key -out client.cert
 </code></pre></div></div>
 
 <p>Now we create a folder inside <code class="highlighter-rouge">certs.d</code> and move the certificates. In the end it should look like this</p>
@@ -288,7 +288,7 @@ Login Succeeded
 
 <p>We discover a <code class="highlighter-rouge">bolt-image</code>, let’s pull and run it locally.</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>docker pull docker.registry.htb/bolt-image
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo docker pull docker.registry.htb/bolt-image
 </code></pre></div></div>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>danps@pwnbox:~/hackthebox/registry$ sudo docker images
@@ -298,7 +298,7 @@ docker.registry.htb/bolt-image   latest              601499e98a60        10 mont
 
 <p>Now let’s enumerate it to see if we find any valid credentials.</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>docker run <span class="nt">-it</span> docker.registry.htb/bolt-image
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo docker run -it docker.registry.htb/bolt-image
 </code></pre></div></div>
 
 <p>Inside the container we can see a <code class="highlighter-rouge">.ssh</code>file inside the <code class="highlighter-rouge">root</code> directory.</p>
@@ -357,7 +357,7 @@ bolt@bolt:~$
 
 <p>Now that we’re inside, let’s fetch our <code class="highlighter-rouge">user.txt</code>.</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bolt@bolt:~<span class="nv">$ </span><span class="nb">cat </span>user.txt
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bolt@bolt:~$ cat user.txt
 ytc0ytdmnz&lt;redacted&gt;
 </code></pre></div></div>
 
@@ -385,7 +385,7 @@ ytc0ytdmnz&lt;redacted&gt;
 
 <p>Searching the web files and configs, we find a <code class="highlighter-rouge">/var/www/html/bolt/app/database/bolt.db</code>which is very likely to have our credential stored.</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>strings /var/www/html/bolt/app/database/bolt.db
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>strings /var/www/html/bolt/app/database/bolt.db
 </code></pre></div></div>
 
 <p>we find</p>
@@ -571,6 +571,20 @@ ntrkzgnkota&lt;redacted&gt;
   <h5>© Copyright 2020 - All Rights Reserved - DanP</h5>
 </div>
 
+
+
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async
+        src="https://www.googletagmanager.com/gtag/js?id=G-4GB1Y6FFJE">
+</script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-4GB1Y6FFJE');
+</script>
 
 </body>
 </html>

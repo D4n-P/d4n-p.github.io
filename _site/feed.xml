@@ -6,8 +6,8 @@
 </description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sat, 04 Apr 2020 16:29:53 -0300</pubDate>
-    <lastBuildDate>Sat, 04 Apr 2020 16:29:53 -0300</lastBuildDate>
+    <pubDate>Wed, 08 Apr 2020 15:52:08 -0300</pubDate>
+    <lastBuildDate>Wed, 08 Apr 2020 15:52:08 -0300</lastBuildDate>
     <generator>Jekyll v3.8.6</generator>
     
       <item>
@@ -86,7 +86,7 @@ GET     301 Moved Permanently           http://registry.htb/install
 
 &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;rustbuster&lt;/code&gt; found a &lt;code class=&quot;highlighter-rouge&quot;&gt;/install&lt;/code&gt; directory. Browsing there, we find a bunch o gibberish that’s clearly a file, we can download with &lt;code class=&quot;highlighter-rouge&quot;&gt;curl&lt;/code&gt;and save it locally.&lt;/p&gt;
 
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl http://registry.htb/install/ &lt;span class=&quot;nt&quot;&gt;-s&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;install&lt;/span&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl http://registry.htb/install/ -s &amp;gt; install
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;Extracting the file we just got, we see two files&lt;/p&gt;
@@ -130,15 +130,15 @@ QMPjq1S5SqXJqzop4OnthgWlwggSe/6z8ZTuDjdNIpx0tF77arh2rUOIXKIerx5B
 
 &lt;p&gt;Another blank page, running &lt;code class=&quot;highlighter-rouge&quot;&gt;rustbuster&lt;/code&gt;again.&lt;/p&gt;
 
-&lt;div class=&quot;language-terminal highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;gp&quot;&gt;danps@pwnbox:~/hackthebox/registry$&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;rustbuster &lt;span class=&quot;nb&quot;&gt;dir&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-u&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;http://docker.registry.htb/&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-w&lt;/span&gt; /usr/share/wordlists/dirb/common.txt  &lt;span class=&quot;nt&quot;&gt;--no-banner&lt;/span&gt;
-&lt;span class=&quot;go&quot;&gt;~ rustbuster v3.0.3 ~ by phra &amp;amp; ps1dr3x ~
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;danps@pwnbox:~/hackthebox/registry$ rustbuster dir -u &quot;http://docker.registry.htb/&quot; -w /usr/share/wordlists/dirb/common.txt  --no-banner
+~ rustbuster v3.0.3 ~ by phra &amp;amp; ps1dr3x ~
 
 [?] Started at	: 2020-04-03 10:47:24
 
 GET	200 OK				                      http://docker.registry.htb/
 GET     301 Moved Permanently           http://docker.registry.htb/v2
-&lt;/span&gt;&lt;span class=&quot;gp&quot;&gt;						=&amp;gt;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;/v2/
-&lt;span class=&quot;gp&quot;&gt;  [00:00:51] #&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;#######################################    4611/4611    ETA: 00:00:00 req/s: 90&lt;/span&gt;
+						=&amp;gt; /v2/
+  [00:00:51] ########################################    4611/4611    ETA: 00:00:00 req/s: 90
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;We find a &lt;code class=&quot;highlighter-rouge&quot;&gt;v2&lt;/code&gt;directory.&lt;/p&gt;
@@ -173,8 +173,8 @@ Error response from daemon: Get https://docker.registry.htb/v2/: x509: certifica
 
 &lt;p&gt;First, we generate our client certificate&lt;/p&gt;
 
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;openssl genrsa &lt;span class=&quot;nt&quot;&gt;-out&lt;/span&gt; client.key 4096
-openssl req &lt;span class=&quot;nt&quot;&gt;-new&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-x509&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-text&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-key&lt;/span&gt; client.key &lt;span class=&quot;nt&quot;&gt;-out&lt;/span&gt; client.cert
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;openssl genrsa -out client.key 4096
+openssl req -new -x509 -text -key client.key -out client.cert
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;Now we create a folder inside &lt;code class=&quot;highlighter-rouge&quot;&gt;certs.d&lt;/code&gt; and move the certificates. In the end it should look like this&lt;/p&gt;
@@ -207,7 +207,7 @@ Login Succeeded
 
 &lt;p&gt;We discover a &lt;code class=&quot;highlighter-rouge&quot;&gt;bolt-image&lt;/code&gt;, let’s pull and run it locally.&lt;/p&gt;
 
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;docker pull docker.registry.htb/bolt-image
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo docker pull docker.registry.htb/bolt-image
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;danps@pwnbox:~/hackthebox/registry$ sudo docker images
@@ -217,7 +217,7 @@ docker.registry.htb/bolt-image   latest              601499e98a60        10 mont
 
 &lt;p&gt;Now let’s enumerate it to see if we find any valid credentials.&lt;/p&gt;
 
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;docker run &lt;span class=&quot;nt&quot;&gt;-it&lt;/span&gt; docker.registry.htb/bolt-image
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo docker run -it docker.registry.htb/bolt-image
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;Inside the container we can see a &lt;code class=&quot;highlighter-rouge&quot;&gt;.ssh&lt;/code&gt;file inside the &lt;code class=&quot;highlighter-rouge&quot;&gt;root&lt;/code&gt; directory.&lt;/p&gt;
@@ -276,7 +276,7 @@ bolt@bolt:~$
 
 &lt;p&gt;Now that we’re inside, let’s fetch our &lt;code class=&quot;highlighter-rouge&quot;&gt;user.txt&lt;/code&gt;.&lt;/p&gt;
 
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bolt@bolt:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cat &lt;/span&gt;user.txt
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bolt@bolt:~$ cat user.txt
 ytc0ytdmnz&amp;lt;redacted&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
@@ -304,7 +304,7 @@ ytc0ytdmnz&amp;lt;redacted&amp;gt;
 
 &lt;p&gt;Searching the web files and configs, we find a &lt;code class=&quot;highlighter-rouge&quot;&gt;/var/www/html/bolt/app/database/bolt.db&lt;/code&gt;which is very likely to have our credential stored.&lt;/p&gt;
 
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;strings /var/www/html/bolt/app/database/bolt.db
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;strings /var/www/html/bolt/app/database/bolt.db
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;we find&lt;/p&gt;
