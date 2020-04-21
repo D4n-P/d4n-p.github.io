@@ -14,4 +14,4 @@ markdown: kramdown
 permalink: /:title/
 
 # Analytics
-prod-analytics-id: G-4GB1Y6FFJE
+prod-analytics-id: UA-164145585-1
